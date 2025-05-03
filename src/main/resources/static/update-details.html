@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Update Details</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body{font-family:Arial;padding:30px;max-width:400px;margin:auto;}
+        input,button{display:block;width:100%;margin:8px 0;padding:8px;}
+        #msg{color:green;}
+    </style>
+</head>
+<body>
+
+<h2>Update Your Details</h2>
+<form id="updateForm">
+    <input type="text"     id="username"    placeholder="Username"  required>
+    <input type="email"    id="email"       placeholder="Email"     required>
+    <input type="password" id="password"    placeholder="Password"  required>
+    <input type="text"     id="address"     placeholder="Address"   required>
+    <input type="text"     id="phoneNumber" placeholder="Phone"     required>
+    <button type="submit">Save Changes</button>
+</form>
+<p id="msg"></p>
+<button id="homeBtn">Back to Home</button>
+
+<script>
+    (async function(){
+      // auth check
+      const user = localStorage.getItem("username");
+      const role = localStorage.getItem("role");
+      if(!user || role!=="customer"){
+        alert("Please log in as customer first.");
+        return location.href="login.html";
+      }
+
+      // fetch all users, find this customer
+      const users = await fetch("/api/users/all").then(r=>r.json());
+      const me    = users.find(u=>u.username===user && u.role==="customer");
+      if(!me) return alert("User not found.");
+
+      // pre-fill form
+      document.getElementById("username").value    = me.username;
+      document.getElementById("email").value       = me.email;
+      document.getElementById("password").value    = me.password;
+      document.getElementById("address").value     = me.address;
+      document.getElementById("phoneNumber").value = me.phoneNumber;
+
+      // on submit
+      document.getElementById("updateForm").onsubmit = async e=>{
+        e.preventDefault();
+        const payload = {
+          id         : me.id,
+          username   : username.value.trim(),
+          email      : email.value.trim(),
+          password   : password.value,
+          address    : address.value.trim(),
+          phoneNumber: phoneNumber.value.trim()
+        };
+        const res = await fetch("/api/users/update", {
+          method:"PUT",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(payload)
+        });
+        const txt = await res.text();
+        document.getElementById("msg").textContent = txt;
+        // update localStorage username if changed
+        localStorage.setItem("username", payload.username);
+      };
+
+      // back to home
+      document.getElementById("homeBtn").onclick = ()=> {
+        location.href = "home.html";
+      };
+    })();
+</script>
+
+</body>
+</html>
