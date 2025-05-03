@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Home</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* quick page‑specific styles */
+        .grid      { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:20px; margin-bottom:80px; }
+        .card      { border:1px solid #ddd; border-radius:8px; overflow:hidden; background:#fff; }
+        .card img  { width:100%; height:130px; object-fit:cover; }
+        .card h4   { margin:6px 8px; font-size:16px; }
+        /* bottom nav bar */
+        nav        { position:fixed; bottom:0; left:0; right:0; height:55px; background:#222; color:#fff;
+                     display:flex; justify-content:space-around; align-items:center; }
+        nav button { background:none; border:none; color:#fff; font-size:15px; }
+        #choiceBox { position:fixed; inset:0; background:#0006; display:none; align-items:center; justify-content:center; }
+        #choiceBox div { background:#fff; padding:25px 30px; border-radius:8px; text-align:center; }
+        #choiceBox button { margin:8px 12px; padding:8px 20px; }
+    </style>
+</head>
+<body>
+
+<h2>Today’s Specials</h2>
+
+<div class="grid">
+    <div class="card"><img src="https://picsum.photos/300/200?food1"><h4>Veggie Delight</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/201?food2"><h4>Cheesy Pizza</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/202?food3"><h4>Grilled Chicken</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/203?food4"><h4>Fruit Salad</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/204?food5"><h4>Burger Combo</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/205?food6"><h4>Chocolate Cake</h4></div>
+</div>
+
+<!-- welcome strip (updates after login) -->
+<p id="welcome"></p>
+
+<!-- ====== bottom navigation ==== -->
+<nav>
+    <span>Home</span>
+    <button id="loginBtn">Login</button>
+</nav>
+
+<!-- ==== owner / customer choice modal ==== -->
+<div id="choiceBox">
+    <div>
+        <h3>Select Login Type</h3>
+        <button id="ownerBtn">Restaurant&nbsp;Owner</button>
+        <button id="custBtn">Customer</button><br>
+        <small><a href="#" id="cancel">cancel</a></small>
+    </div>
+</div>
+
+<script>
+    /* -------------- persistent login info with localStorage -------------- */
+    const username = localStorage.getItem("username");
+    const role     = localStorage.getItem("role");   // "customer" | "restaurant"
+
+    if (username){
+       document.getElementById("welcome").textContent =
+            `Welcome, ${username} (${role})`;
+       document.getElementById("loginBtn").textContent = "Logout";
+    }
+
+    /* -------------- login / logout button behaviour --------------------- */
+    document.getElementById("loginBtn").onclick = ()=>{
+       if (localStorage.getItem("username")){
+           localStorage.clear();
+           location.reload();            // logout
+       } else {
+           document.getElementById("choiceBox").style.display="flex"; // show modal
+       }
+    };
+
+    document.getElementById("ownerBtn").onclick = ()=>{
+       location.href = "login.html?role=owner";
+    };
+    document.getElementById("custBtn").onclick = ()=>{
+       location.href = "login.html?role=customer";
+    };
+    document.getElementById("cancel").onclick = e=>{
+       e.preventDefault();
+       document.getElementById("choiceBox").style.display="none";
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register • ByteEats</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h2>Customer Registration</h2>
+
+<form id="registerForm">
+    <input type="text"     id="username"    placeholder="Username"  required><br>
+    <input type="email"    id="email"       placeholder="Email"     required><br>
+    <input type="password" id="password"    placeholder="Password"  required><br>
+    <input type="text"     id="address"     placeholder="Address"   required><br>
+    <input type="text"     id="phoneNumber" placeholder="Phone"     required><br>
+    <button id="regBtn" type="submit">Register</button>
+</form>
+
+<p id="msg"></p>
+<p>Already have an account? <a href="login.html?role=customer">Log in</a></p>
+
+<script>
+    const form   = document.getElementById("registerForm");
+    const btn    = document.getElementById("regBtn");
+    const msgBox = document.getElementById("msg");
+
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      btn.disabled = true;           // avoid double‑clicks
+      msgBox.textContent = "Registering…";
+
+      const payload = {
+        username   : username.value.trim(),
+        email      : email.value.trim(),
+        password   : password.value,
+        address    : address.value.trim(),
+        phoneNumber: phoneNumber.value.trim()
+      };
+
+      try {
+        const res  = await fetch("/api/users/register", {
+          method : "POST",
+          headers: {"Content-Type":"application/json"},
+          body   : JSON.stringify(payload)
+        });
+        const text = await res.text().then(t=>t.trim());
+        if (text === "Customer registered!") {
+            // success – go straight to login page
+            alert("Registration successful! Please log in.");
+            location.href = "login.html?role=customer";
+        } else {
+            // any other server response
+            msgBox.textContent = text;
+        }
+      } catch(err){
+        msgBox.textContent = "Network error – please try again.";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+</script>
+</body>
+</html>
