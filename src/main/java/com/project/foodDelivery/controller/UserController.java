@@ -10,17 +10,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * UserController v2  – single‑owner admin + customer registration.
- */
+
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    /* ------------------------------------------------------------
-     *  1)  CUSTOMER  REGISTRATION  (role enforced = customer)
-     * ------------------------------------------------------------ */
+
+    //CUSTOMER  REGISTRATION  (role enforced = customer)
+
     @PostMapping("/register")
     public String registerCustomer(@RequestBody RegisterRequest dto) {
 
@@ -36,9 +34,9 @@ public class UserController {
         return "Customer registered!";
     }
 
-    /* ------------------------------------------------------------
-     *  2)  ADMIN  REGISTRATION  (only once)
-     * ------------------------------------------------------------ */
+
+      //ADMIN  REGISTRATION  (only once)
+
     @PostMapping("/registerAdmin")
     public String registerAdmin(@RequestBody RegisterRequest dto) {
 
@@ -54,9 +52,9 @@ public class UserController {
         return "Admin account created!";
     }
 
-    /* ------------------------------------------------------------
-     *  3)  LOGIN  (returns simple text)
-     * ------------------------------------------------------------ */
+
+    // LOGIN  (returns simple text)
+
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest dto) {
         return UserFileHandler.readAllUsers().stream()
@@ -67,9 +65,9 @@ public class UserController {
                 .orElse("Login failed");
     }
 
-    /* ============================================================
-     *                ADMIN‑ONLY  READ  ENDPOINTS
-     * ============================================================ */
+
+// ADMIN‑ONLY  READ  ENDPOINTS
+
 
     /** List only customers (no admin).  GET /api/users/customers */
     @GetMapping("/customers")
@@ -85,9 +83,7 @@ public class UserController {
         return UserFileHandler.readAllUsers();
     }
 
-    /* ------------------------------------------------------------
-     * (Optional) single record, update & delete – still admin use
-     * ------------------------------------------------------------ */
+
     @GetMapping("/{id}")
     public User getById(@PathVariable String id) {
         return UserFileHandler.findUserById(id);

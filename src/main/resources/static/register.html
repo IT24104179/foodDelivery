@@ -2,35 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register • ByteEats</title>
+    <title>ByteEats • Register</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>Customer Registration</h2>
 
-<form id="registerForm">
-    <input type="text"     id="username"    placeholder="Username"  required><br>
-    <input type="email"    id="email"       placeholder="Email"     required><br>
-    <input type="password" id="password"    placeholder="Password"  required><br>
-    <input type="text"     id="address"     placeholder="Address"   required><br>
-    <input type="text"     id="phoneNumber" placeholder="Phone"     required><br>
-    <button id="regBtn" type="submit">Register</button>
-</form>
-
-<p id="msg"></p>
-<p>Already have an account? <a href="login.html?role=customer">Log in</a></p>
+<div class="container">
+    <div class="card" style="max-width:400px; margin:40px auto; padding:20px;">
+        <h2 style="text-align:center; margin-bottom:20px;">Customer Registration</h2>
+        <form id="registerForm">
+            <input type="text"     id="username"    placeholder="Username"  required>
+            <input type="email"    id="email"       placeholder="Email"     required>
+            <input type="password" id="password"    placeholder="Password"  required>
+            <input type="text"     id="address"     placeholder="Address"   required>
+            <input type="text"     id="phoneNumber" placeholder="Phone"     required>
+            <button id="regBtn" type="submit">Register</button>
+        </form>
+        <p id="msg" style="text-align:center; margin-top:10px;"></p>
+        <p style="text-align:center; margin-top:15px;">
+            Already have an account? <a href="login.html">Log in</a>
+        </p>
+    </div>
+</div>
 
 <script>
-    const form   = document.getElementById("registerForm");
-    const btn    = document.getElementById("regBtn");
-    const msgBox = document.getElementById("msg");
+    const form = document.getElementById("registerForm"),
+          btn  = document.getElementById("regBtn"),
+          msg  = document.getElementById("msg");
 
-    form.addEventListener("submit", async (e)=>{
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      btn.disabled = true;           // avoid double‑clicks
-      msgBox.textContent = "Registering…";
+      btn.disabled = true;
+      msg.textContent = "Registering…";
 
-      const payload = {
+      const data = {
         username   : username.value.trim(),
         email      : email.value.trim(),
         password   : password.value,
@@ -39,26 +44,25 @@
       };
 
       try {
-        const res  = await fetch("/api/users/register", {
+        const res = await fetch("/api/users/register", {
           method : "POST",
-          headers: {"Content-Type":"application/json"},
-          body   : JSON.stringify(payload)
+          headers: { "Content-Type":"application/json" },
+          body   : JSON.stringify(data)
         });
-        const text = await res.text().then(t=>t.trim());
-        if (text === "Customer registered!") {
-            // success – go straight to login page
-            alert("Registration successful! Please log in.");
-            location.href = "login.html?role=customer";
+        const txt = await res.text().then(t=>t.trim());
+        if (txt === "Customer registered!") {
+          alert("Registered! Please log in.");
+          location.href = "login.html";
         } else {
-            // any other server response
-            msgBox.textContent = text;
+          msg.textContent = txt;
         }
-      } catch(err){
-        msgBox.textContent = "Network error – please try again.";
+      } catch {
+        msg.textContent = "Network error — try again.";
       } finally {
         btn.disabled = false;
       }
     });
 </script>
+
 </body>
 </html>

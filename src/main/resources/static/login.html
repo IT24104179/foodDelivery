@@ -2,71 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ByteEats - Login</title>
+    <title>ByteEats • Login</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>User Login</h2>
 
-<form id="loginForm">
-    <input type="email" placeholder="Email" id="email" required><br>
-    <input type="password" placeholder="Password" id="password" required><br>
-    <button type="submit">Login</button>
-</form>
-
-<p id="loginMsg"></p>
+<div class="container">
+    <div class="card" style="max-width:400px; margin:40px auto; padding:20px;">
+        <h2 style="text-align:center; margin-bottom:20px;">User Login</h2>
+        <form id="loginForm">
+            <input type="email"    id="email"    placeholder="Email"    required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p id="loginMsg" style="text-align:center; margin-top:10px;"></p>
+        <p style="text-align:center; margin-top:15px;">
+            No account? <a href="register.html">Register here</a>
+        </p>
+    </div>
+</div>
 
 <script>
-    const params = new URLSearchParams(location.search);
-const pageRole = params.get("role") || "customer";       // owner | customer
+    document.getElementById("loginForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const payload = { email: email.value, password: password.value };
+      const res = await fetch("/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      const text = await res.text();
+      document.getElementById("loginMsg").textContent = text;
 
-/********** existing listener **********/
-document.getElementById('loginForm').addEventListener('submit', async e=>{
-  e.preventDefault();
-
-  const loginData = {
-     email   : email.value,
-     password: password.value
-  };
-  const res = await fetch("/api/users/login", {
-       method : "POST",
-       headers: {"Content-Type":"application/json"},
-       body   : JSON.stringify(loginData)
-  });
-  const txt = await res.text();
-  loginMsg.textContent = txt;
-
-  /* success? our earlier controller returns
-     "Login success: {username} (customer)"           */
-  if (txt.startsWith("Login success")){
-        const userRole = txt.includes("(restaurant)") ? "restaurant":"customer";
-        if (pageRole==="owner" && userRole!=="restaurant"){
-            alert("Only owner can log in here");
-            return;
-        }
-        localStorage.setItem("username", txt.split(":")[1].split("(")[0].trim());
-        localStorage.setItem("role", userRole);
-        location.href = "home.html";
-  }
-});
-
-    const form = document.getElementById('loginForm');
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const loginData = {
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value
-        };
-
-        const res = await fetch("/api/users/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(loginData)
-        });
-
-        const msg = await res.text();
-        document.getElementById('loginMsg').innerText = msg;
+      if (text.startsWith("Login success")) {
+        const userPart = text.split("Login success:")[1].trim();
+        const name     = userPart.split("(")[0].trim();
+        const role     = userPart.includes("(restaurant)") ? "restaurant" : "customer";
+        localStorage.setItem("username", name);
+        localStorage.setItem("role", role);
+        location.href = role === "restaurant" ? "ownerhome.html" : "home.html";
+      }
     });
 </script>
+
 </body>
 </html>
