@@ -5,16 +5,16 @@ import com.project.foodDelivery.model.Customer;
 import com.project.foodDelivery.model.RestaurantOwner;
 import com.project.foodDelivery.model.User;
 
-import java.io.*;
+import java.io.*; // bufferWriter/reader,filewritter/reader,IOexception
 import java.util.ArrayList;
-import java.util.List;
+import java.util.List; //List and stream
 
 public class UserFileHandler {
-    private static final String FILE_PATH = "users.txt";
+    private static final String FILE_PATH = "users.txt"; // since this is static,don't need to make an object to access it
 
     // create method
     public static void saveUser(User user) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) { //append mode, meaning new data is added to the end of the file instead of overwriting it
             writer.write(user.toFileString());
             writer.newLine();
         } catch (IOException e) {
@@ -24,12 +24,12 @@ public class UserFileHandler {
 
     // read method
     public static List<User> readAllUsers() {
-        List<User> users = new ArrayList<>();
+        List<User> users = new ArrayList<>(); //Creates an empty ArrayList to store User objects
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                String[] p = line.split(",", -1);
-                if (p.length < 7) continue;
+            while ((line = br.readLine()) != null) {//Reads the file line by line until reaching the end
+                String[] p = line.split(",", -1);//Splits each line by comma and put them into an array.-1 means spaces are included.
+                if (p.length < 7) continue; // it skips lines which has fields less than 7 to avoid errors
 
                 String id       = p[0];
                 String userName = p[1];
@@ -41,19 +41,21 @@ public class UserFileHandler {
 
                 if ("restaurant".equals(role)) {
                     users.add(new RestaurantOwner(id, userName, email, pwd, addr, phone));
-                } else {                                  // default = customer
+                } else {// default = customer
                     users.add(new Customer(id, userName, email, pwd, addr, phone));
                 }
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return users;
     }
 
     //find method
     public static User findUserById(String id) {
-        return readAllUsers().stream()
-                .filter(u -> u.getId().equals(id))
-                .findFirst()
+        return readAllUsers().stream()//Converts the list of users into a stream so we can search through it easily.
+                .filter(u -> u.getId().equals(id)) //this has a lambda expression similar to arrow function
+                .findFirst() //  find the first matching user
                 .orElse(null);
     }
     //update method
@@ -78,7 +80,7 @@ public class UserFileHandler {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (User user : users) {
                 if (!user.getId().equals(id)) {
-                    writer.write(user.toFileString());
+                    writer.write(user.toFileString()); //overwrite all users except the one we want to delete.
                     writer.newLine();
                 }
             }

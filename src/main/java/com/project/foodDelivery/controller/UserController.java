@@ -4,24 +4,53 @@ import com.project.foodDelivery.model.Customer;
 import com.project.foodDelivery.model.RestaurantOwner;
 import com.project.foodDelivery.model.User;
 import com.project.foodDelivery.service.UserFileHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
-@RestController
-@RequestMapping("/api/users")
-@CrossOrigin(origins = "*")
+@Controller
+@RequestMapping("/")
 public class UserController {
 
+    @GetMapping("/")
+    public String home(Model model) {
+        return "home";
+    }
 
-    //CUSTOMER  REGISTRATION  (role enforced = customer)
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
 
-    @PostMapping("/register")
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
+    }
+
+    @GetMapping("/owner-home")
+    public String ownerHome() {
+        return "ownerHome";
+    }
+
+    @GetMapping("/admin-dashboard")
+    public String adminDashboard(Model model) {
+        model.addAttribute("users", UserFileHandler.readAllUsers());
+        return "admin-dashboard";
+    }
+
+    @GetMapping("/update-details")
+    public String updateDetailsPage() {
+        return "update-details";
+    }
+
+    // API endpoints
+    @PostMapping("/api/users/register")
+    @ResponseBody
     public String registerCustomer(@RequestBody RegisterRequest dto) {
-
         // prevent duplicate e‑mail
         boolean dup = UserFileHandler.readAllUsers().stream()
                 .anyMatch(u -> u.getEmail().equalsIgnoreCase(dto.getEmail()));
@@ -34,12 +63,9 @@ public class UserController {
         return "Customer registered!";
     }
 
-
-      //ADMIN  REGISTRATION  (only once)
-
-    @PostMapping("/registerAdmin")
+    @PostMapping("/api/users/registerAdmin")
+    @ResponseBody
     public String registerAdmin(@RequestBody RegisterRequest dto) {
-
         boolean adminExists = UserFileHandler.readAllUsers().stream()
                 .anyMatch(u -> "restaurant".equals(u.getRole()));
         if (adminExists) return "Admin already exists";
@@ -52,10 +78,8 @@ public class UserController {
         return "Admin account created!";
     }
 
-
-    // LOGIN  (returns simple text)
-
-    @PostMapping("/login")
+    @PostMapping("/api/users/login")
+    @ResponseBody
     public String login(@RequestBody LoginRequest dto) {
         return UserFileHandler.readAllUsers().stream()
                 .filter(u -> u.getEmail().equalsIgnoreCase(dto.getEmail()) &&
@@ -65,33 +89,29 @@ public class UserController {
                 .orElse("Login failed");
     }
 
-
-// ADMIN‑ONLY  READ  ENDPOINTS
-
-
-    /** List only customers (no admin).  GET /api/users/customers */
-    @GetMapping("/customers")
+    @GetMapping("/api/users/customers")
+    @ResponseBody
     public List<User> getCustomers() {
         return UserFileHandler.readAllUsers().stream()
                 .filter(u -> "customer".equals(u.getRole()))
                 .collect(Collectors.toList());
     }
 
-    /** List everyone (owner + customers).  GET /api/users/all */
-    @GetMapping("/all")
+    @GetMapping("/api/users/all")
+    @ResponseBody
     public List<User> getAll() {
         return UserFileHandler.readAllUsers();
     }
 
-
-    @GetMapping("/{id}")
+    @GetMapping("/api/users/{id}")
+    @ResponseBody
     public User getById(@PathVariable String id) {
         return UserFileHandler.findUserById(id);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/api/users/update")
+    @ResponseBody
     public String updateUser(@RequestBody RegisterRequest dto) {
-        // role is derived from existing record
         User existing = UserFileHandler.findUserById(dto.getId());
         if (existing == null) return "User not found";
 
@@ -107,7 +127,8 @@ public class UserController {
         return "User updated";
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/api/users/delete/{id}")
+    @ResponseBody
     public String deleteUser(@PathVariable String id) {
         if (UserFileHandler.findUserById(id) == null) return "User not found";
         UserFileHandler.deleteUser(id);
