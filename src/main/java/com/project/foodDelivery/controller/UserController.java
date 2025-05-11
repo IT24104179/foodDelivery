@@ -12,14 +12,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Controller
-@RequestMapping("/")
+@Controller //this keyword tells to spring boot, this class controls web requests and returns web pages.
+@RequestMapping("/") // all URLs start from /
 public class UserController {
 
+    //page routes
     @GetMapping("/")
     public String home(Model model) {
         return "home";
-    }
+    } //Model model lets send data to HTML pages
 
     @GetMapping("/login")
     public String loginPage() {
@@ -47,16 +48,19 @@ public class UserController {
         return "update-details";
     }
 
+
+
     // API endpoints
-    @PostMapping("/api/users/register")
+    @PostMapping("/api/users/register") //Handles POST requests sent to URL
     @ResponseBody
-    public String registerCustomer(@RequestBody RegisterRequest dto) {
+    public String registerCustomer(@RequestBody RegisterRequest dto) {//Converts the incoming JSON into a Java object called dto (data transfer object)
         // prevent duplicate e‑mail
-        boolean dup = UserFileHandler.readAllUsers().stream()
+        //dto has all the user data
+        boolean dup = UserFileHandler.readAllUsers().stream() // stream is an easy and powerful way to process data
                 .anyMatch(u -> u.getEmail().equalsIgnoreCase(dto.getEmail()));
         if (dup) return "E‑mail already in use";
 
-        String id = UUID.randomUUID().toString();
+        String id = UUID.randomUUID().toString(); //Creates a unique ID
         Customer customer = new Customer(id, dto.getUsername(), dto.getEmail(),
                 dto.getPassword(), dto.getAddress(), dto.getPhoneNumber());
         UserFileHandler.saveUser(customer);
@@ -67,7 +71,7 @@ public class UserController {
     @ResponseBody
     public String registerAdmin(@RequestBody RegisterRequest dto) {
         boolean adminExists = UserFileHandler.readAllUsers().stream()
-                .anyMatch(u -> "restaurant".equals(u.getRole()));
+                .anyMatch(u -> "owner".equals(u.getRole()));
         if (adminExists) return "Admin already exists";
 
         String id = UUID.randomUUID().toString();
@@ -105,6 +109,7 @@ public class UserController {
 
     @GetMapping("/api/users/{id}")
     @ResponseBody
+    // PathVariable takes the value from {id} in the URL and gives it to this method.
     public User getById(@PathVariable String id) {
         return UserFileHandler.findUserById(id);
     }
@@ -116,7 +121,7 @@ public class UserController {
         if (existing == null) return "User not found";
 
         User updated;
-        if ("restaurant".equals(existing.getRole())) {
+        if ("owner".equals(existing.getRole())) {
             updated = new RestaurantOwner(existing.getId(), dto.getUsername(), dto.getEmail(),
                     dto.getPassword(), dto.getAddress(), dto.getPhoneNumber());
         } else {
@@ -135,10 +140,12 @@ public class UserController {
         return "User deleted";
     }
 
-    /* ============================================================
-     *  DTO (Data‑Transfer‑Object) classes
-     * ============================================================ */
-    static class RegisterRequest {
+
+     // DTO (Data‑Transfer‑Object) classes
+    //The client (frontend) would have to send unnecessary data like id, role, thats why this class has separated
+    // dto classes
+
+    private static class RegisterRequest {
         private String id;           // used only for update
         private String username;
         private String email;
@@ -160,7 +167,7 @@ public class UserController {
         public void setPhoneNumber(String n){ this.phoneNumber = n; }
     }
 
-    static class LoginRequest {
+     private static class LoginRequest {
         private String email, password;
         public String getEmail()            { return email; }
         public void setEmail(String e)      { this.email = e; }
