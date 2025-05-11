@@ -4,11 +4,98 @@
     <meta charset="UTF-8">
     <title>ByteEats • Register</title>
     <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        body {
+            background-color: #F1EFEC;
+            background-image: url('https://images.unsplash.com/photo-1543353071-10c8ba85a904?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        nav {
+            background-color: #D4C9BE;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav button {
+            background-color: #123458;
+            color: #F1EFEC;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+        }
+        nav button:hover {
+            background-color: #030303;
+        }
+        .form-container {
+            background: #F1EFEC;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 2rem auto;
+            border: 1px solid #D4C9BE;
+        }
+        .form-container h2 {
+            color: #123458;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #123458;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #D4C9BE;
+            border-radius: 4px;
+            background-color: #F1EFEC;
+            box-sizing: border-box;
+        }
+        .form-container button {
+            background-color: #123458;
+            color: #F1EFEC;
+            padding: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        .form-container button:hover {
+            background-color: #030303;
+        }
+        .form-container p {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .form-container a {
+            color: #123458;
+            text-decoration: none;
+        }
+        .form-container a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
 <nav>
-    <span>🍔 ByteEats</span>
+    <span>🍔 Snak Sprint</span>
     <div>
         <button onclick="location.href='/'">Home</button>
     </div>

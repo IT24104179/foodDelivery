@@ -2,44 +2,270 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>ByteEats • Restaurant Owner</title>
+    <title>Snak Sprint • Restaurant Owner</title>
     <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        body {
+            background-color: #F1EFEC;
+            background-image: url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        nav {
+            background-color: #D4C9BE;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav button {
+            background-color: #123458;
+            color: #F1EFEC;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+        }
+        nav button:hover {
+            background-color: #030303;
+        }
+        .dashboard {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: #F1EFEC;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #D4C9BE;
+        }
+        .stat-card h3 {
+            color: #123458;
+            margin-bottom: 0.5rem;
+        }
+        .menu-section {
+            background: #F1EFEC;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #D4C9BE;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .menu-item {
+            background: #F1EFEC;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #D4C9BE;
+        }
+        .action-button {
+            background-color: #123458;
+            color: #F1EFEC;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            background-color: #030303;
+        }
+        .menu-form {
+            background: #F1EFEC;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #D4C9BE;
+            margin-top: 2rem;
+        }
+        input, textarea {
+            border: 1px solid #D4C9BE;
+            background-color: #F1EFEC;
+            padding: 0.5rem;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+    </style>
+    <style>
+        .dashboard-header {
+            background: #2c3e50;
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2rem;
+        }
+        .stat-card p {
+            color: #666;
+            margin: 0.5rem 0 0;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .action-buttons button {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .primary-btn {
+            background: #3498db;
+            color: white;
+        }
+        .secondary-btn {
+            background: #2ecc71;
+            color: white;
+        }
+        .danger-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        .admin-btn {
+            background: #9b59b6;
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
+
 <body>
 
 <nav>
-    <span>🍔 ByteEats</span>
+    <span>🍔 Snak Sprint</span>
     <div>
-        <button id="logoutBtn">Logout</button>
+        <button class="admin-btn" id="adminDashboardBtn">Admin Dashboard</button>
+        <button class="danger-btn" id="logoutBtn">Logout</button>
     </div>
 </nav>
 
 <div class="container">
-    <h2>Restaurant Owner Dashboard</h2>
+    <div class="dashboard-header">
+        <div>
+            <h2 id="welcome-message">Restaurant Owner Dashboard</h2>
+            <p>Manage your restaurant operations</p>
+        </div>
+        <div class="action-buttons">
+            <button class="primary-btn" onclick="location.href='#'">Add New Item</button>
+            <button class="secondary-btn" onclick="location.href='/update-details'">Update Profile</button>
+        </div>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>0</h3>
+            <p>New Orders</p>
+        </div>
+        <div class="stat-card">
+            <h3>0</h3>
+            <p>Active Orders</p>
+        </div>
+        <div class="stat-card">
+            <h3>0</h3>
+            <p>Menu Items</p>
+        </div>
+        <div class="stat-card">
+            <h3>$0</h3>
+            <p>Today's Revenue</p>
+        </div>
+    </div>
+
     <div class="dashboard-grid">
         <div class="card">
-            <h3>Orders</h3>
-            <p>No new orders</p>
+            <h3>Recent Orders</h3>
+            <p>No orders yet</p>
+            <button class="primary-btn">View All Orders</button>
         </div>
         <div class="card">
-            <h3>Menu</h3>
-            <button onclick="location.href='#'">Manage Menu</button>
+            <h3>Menu Management</h3>
+            <p>Manage your restaurant's menu items</p>
+            <button class="secondary-btn" onclick="location.href='#'">Manage Menu</button>
         </div>
         <div class="card">
-            <h3>Profile</h3>
-            <button onclick="location.href='#'">Update Details</button>
+            <h3>Restaurant Settings</h3>
+            <p>Update your restaurant details and settings</p>
+            <button class="primary-btn" onclick="location.href='/update-details'">Update Settings</button>
         </div>
     </div>
 </div>
 
 <script th:inline="javascript">
-    const logoutBtn = document.getElementById('logoutBtn');
+    // Check if user is logged in and is an owner
+    const role = localStorage.getItem('role');
+    const username = localStorage.getItem('username');
     
+    if (!role || role !== 'owner') {
+        alert('Access denied. Please log in as a restaurant owner.');
+        location.href = '/login';
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    const adminDashboardBtn = document.getElementById('adminDashboardBtn');
+    
+    // Update welcome message
+    if (username) {
+        const welcome = document.getElementById('welcome-message');
+        welcome.textContent = `Welcome, ${username}!`;
+    }
+
+    // Admin Dashboard button
+    adminDashboardBtn.onclick = () => {
+        location.href = '/admin-dashboard';
+    };
+    
+    // Logout button
     logoutBtn.onclick = () => {
         localStorage.clear();
-        location.href = /*[[@{/}]]*/ "";
+        location.href = '/';
     };
 </script>
 
 </body>
-</html> 
+</html>

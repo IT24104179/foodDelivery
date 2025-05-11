@@ -39,7 +39,7 @@ public class UserFileHandler {
                 String addr     = p[5];
                 String phone    = p[6];
 
-                if ("restaurant".equals(role)) {
+                if ("owner".equals(role)) {
                     users.add(new RestaurantOwner(id, userName, email, pwd, addr, phone));
                 } else {// default = customer
                     users.add(new Customer(id, userName, email, pwd, addr, phone));

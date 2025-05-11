@@ -4,11 +4,73 @@
     <meta charset="UTF-8">
     <title>ByteEats • Login</title>
     <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        body {
+            background-color: #F1EFEC;
+            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+        }
+        nav {
+            background-color: #D4C9BE;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav button {
+            background-color: #123458;
+            color: #F1EFEC;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .form-container {
+            background: #F1EFEC;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 2rem auto;
+            border: 1px solid #D4C9BE;
+        }
+        .form-container button {
+            background-color: #123458;
+            color: #F1EFEC;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-container button:hover {
+            background-color: #030303;
+        }
+        .form-group input {
+            border: 1px solid #D4C9BE;
+            background-color: #F1EFEC;
+            padding: 0.5rem;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        a {
+            color: #123458;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
 <nav>
-    <span>🍔 ByteEats</span>
+    <span>🍔 Snak Sprint</span>
     <div>
         <button onclick="location.href='/'">Home</button>
     </div>
@@ -45,27 +107,34 @@
                 body: JSON.stringify({ email, password })
             });
 
-            const result = await response.text();
-            if (result.startsWith('Login success')) {
-                const [_, userInfo] = result.split(': ');
-                const [username, role] = userInfo.split(' (');
-                localStorage.setItem('username', username);
-                localStorage.setItem('role', role.replace(')', ''));
+            const result = await response.json();
+            if (result.success) {
+                console.log('Login successful, got role:', result.role);
+                // Store all user data
+                localStorage.setItem('username', result.username);
+                localStorage.setItem('role', result.role);
+                localStorage.setItem('email', email);
+                localStorage.setItem('id', result.id);
                 
-                if (role.includes('restaurant')) {
+                if (result.role === 'owner') {
+                    console.log('Redirecting to owner home');
                     location.href = /*[[@{/owner-home}]]*/ "";
+                } else if (result.role === 'customer') {
+                    console.log('Redirecting to customer home');
+                    location.href = /*[[@{/customer-home}]]*/ "";
                 } else {
-                    location.href = /*[[@{/}]]*/ "";
+                    console.log('Unknown role:', result.role);
                 }
             } else {
-                alert('Login failed. Please check your credentials.');
+                alert(result.message || 'Login failed. Please check your credentials.');
             }
         } catch (error) {
             alert('An error occurred. Please try again.');
+            console.error(error);
         }
         return false;
     }
 </script>
 
 </body>
-</html> 
+</html>

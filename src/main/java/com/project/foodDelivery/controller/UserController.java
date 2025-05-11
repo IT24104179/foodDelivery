@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/") // all URLs start from /
 public class UserController {
 
+
     //page routes
     @GetMapping("/")
     public String home(Model model) {
@@ -34,7 +35,14 @@ public class UserController {
 
     @GetMapping("/owner-home")
     public String ownerHome() {
+        // Only owners can access this page, others will be redirected to login
         return "ownerHome";
+    }
+
+    @GetMapping("/customer-home")
+    public String customerHome() {
+        // Only customers can access this page, others will be redirected to login
+        return "customerHome";
     }
 
     @GetMapping("/admin-dashboard")
@@ -70,27 +78,49 @@ public class UserController {
     @PostMapping("/api/users/registerAdmin")
     @ResponseBody
     public String registerAdmin(@RequestBody RegisterRequest dto) {
+        System.out.println("Attempting to register admin with email: " + dto.getEmail());
+        
         boolean adminExists = UserFileHandler.readAllUsers().stream()
                 .anyMatch(u -> "owner".equals(u.getRole()));
-        if (adminExists) return "Admin already exists";
+        if (adminExists) {
+            System.out.println("Admin registration failed: Admin already exists");
+            return "Admin already exists";
+        }
 
         String id = UUID.randomUUID().toString();
         RestaurantOwner owner = new RestaurantOwner(id, dto.getUsername(), dto.getEmail(),
                 dto.getPassword(), dto.getAddress(),
                 dto.getPhoneNumber());
+                
+        System.out.println("Creating new admin with role: " + owner.getRole());
         UserFileHandler.saveUser(owner);
+        System.out.println("Admin account created successfully");
         return "Admin account created!";
     }
 
     @PostMapping("/api/users/login")
     @ResponseBody
-    public String login(@RequestBody LoginRequest dto) {
-        return UserFileHandler.readAllUsers().stream()
+    public LoginResponse login(@RequestBody LoginRequest dto) {
+        List<User> users = UserFileHandler.readAllUsers();
+        // Debug: Print all users and their roles
+        System.out.println("All users:");
+        for (User u : users) {
+            System.out.println("Email: " + u.getEmail() + ", Role: " + u.getRole());
+        }
+        
+        User matchedUser = users.stream()
                 .filter(u -> u.getEmail().equalsIgnoreCase(dto.getEmail()) &&
                         u.getPassword().equals(dto.getPassword()))
                 .findFirst()
-                .map(u -> "Login success: " + u.getUsername() + " (" + u.getRole() + ")")
-                .orElse("Login failed");
+                .orElse(null);
+                
+        if (matchedUser != null) {
+            System.out.println("Login successful for user: " + matchedUser.getEmail() + ", Role: " + matchedUser.getRole());
+            return new LoginResponse(true, matchedUser.getUsername(), matchedUser.getRole(), "", matchedUser.getId());
+        } else {
+            System.out.println("Login failed for email: " + dto.getEmail());
+            return new LoginResponse(false, "", "", "Invalid credentials", "");
+        }
     }
 
     @GetMapping("/api/users/customers")
@@ -173,5 +203,27 @@ public class UserController {
         public void setEmail(String e)      { this.email = e; }
         public String getPassword()         { return password; }
         public void setPassword(String p)   { this.password = p; }
+    }
+
+    private static class LoginResponse {
+        private boolean success;
+        private String username;
+        private String role;
+        private String message;
+        private String id;
+
+        public LoginResponse(boolean success, String username, String role, String message, String id) {
+            this.success = success;
+            this.username = username;
+            this.role = role;
+            this.message = message;
+            this.id = id;
+        }
+
+        public boolean isSuccess() { return success; }
+        public String getUsername() { return username; }
+        public String getRole() { return role; }
+        public String getMessage() { return message; }
+        public String getId() { return id; }
     }
 }

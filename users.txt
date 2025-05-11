@@ -1,4 +1,2 @@
-123e4567-e89b-12d3-a456-426614174000,Owner,owner@byteeats.com,admin123,restaurant,Head Office,0710000000
-9b19e3e6-9dc6-496e-b542-079b6d9c1916,akd,akd@123,sss,customer,anuradhapura,1234567
-adfe6c93-6bf6-4a80-9c34-2fc63a671eeb,saman,saman@gmail.com,147,customer,malabe sliit,159753
-1ccd6808-33d3-465f-bb13-3b599a2daafc,kavindu,kavindu@gmail.com,kavindu,customer,colombo,123456
+123e4567-e89b-12d3-a456-426614174000,Owner,owner@123,admin123,owner,Head Office,0710000000
+3db89482-e81a-4193-9e11-c90be32b500c,Yasindu,yasi17994@gmail.com,123,customer,Liyanage stores Kandy road,0713576886
