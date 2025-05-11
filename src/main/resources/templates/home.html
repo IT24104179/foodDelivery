@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Home</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        .grid      { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:20px; margin:40px 20px; }
+        .card      { border:1px solid #ddd; border-radius:8px; overflow:hidden; background:#fff; }
+        .card img  { width:100%; height:130px; object-fit:cover; }
+        .card h4   { margin:6px 8px; font-size:16px; }
+        nav        { background:#222; color:#fff; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
+        nav button { background:none; border:1px solid #fff; color:#fff; padding:6px 12px; margin-left:8px; cursor:pointer; border-radius:4px; }
+        #welcome   { margin:0 20px; font-size:14px; color:#333; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span>🍔 ByteEats</span>
+    <div>
+        <button id="updateBtn" style="display:none;">Update Details</button>
+        <button id="loginBtn">Login</button>
+    </div>
+</nav>
+
+<p id="welcome" th:text="${welcomeMessage}"></p>
+
+<h2 style="margin:20px;">Today's Specials</h2>
+<div class="grid">
+    <div class="card"><img src="https://picsum.photos/300/200?food1"><h4>Veggie Delight</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/201?food2"><h4>Cheesy Pizza</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/202?food3"><h4>Grilled Chicken</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/203?food4"><h4>Fruit Salad</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/204?food5"><h4>Burger Combo</h4></div>
+    <div class="card"><img src="https://picsum.photos/300/205?food6"><h4>Chocolate Cake</h4></div>
+</div>
+
+<script th:inline="javascript">
+    const user = /*[[${user}]]*/ null;
+    const role = /*[[${role}]]*/ null;
+    const loginBtn  = document.getElementById("loginBtn");
+    const updateBtn = document.getElementById("updateBtn");
+    const welcome   = document.getElementById("welcome");
+
+    if (user) {
+      // owner goes to ownerhome
+      if (role === "restaurant") {
+        location.href = /*[[@{/owner-home}]]*/ "";
+        throw "";
+      }
+      // customer sees welcome + update btn
+      welcome.textContent = `Welcome back, ${user}!`;
+      loginBtn.textContent = "Logout";
+      updateBtn.style.display = "inline-block";
+    }
+
+    // Login / Logout
+    loginBtn.onclick = () => {
+      if (user) {
+        fetch('/api/users/logout', { method: 'POST' })
+          .then(() => location.reload());
+      } else {
+        location.href = /*[[@{/login}]]*/ "";
+      }
+    };
+
+    // Update Details
+    updateBtn.onclick = () => {
+      location.href = /*[[@{/update-details}]]*/ "";
+    };
+</script>
+
+</body>
+</html> 

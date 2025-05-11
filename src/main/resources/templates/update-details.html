@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Update Details</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+
+<nav>
+    <span>🍔 ByteEats</span>
+    <div>
+        <button onclick="location.href='/'">Home</button>
+    </div>
+</nav>
+
+<div class="form-container">
+    <h2>Update Details</h2>
+    <form id="updateForm" onsubmit="return handleUpdate(event)">
+        <input type="hidden" id="id" th:value="${user?.id}">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" th:value="${user?.username}" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" th:value="${user?.email}" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" th:value="${user?.address}" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${user?.phoneNumber}" required>
+        </div>
+        <button type="submit">Update</button>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    async function handleUpdate(event) {
+        event.preventDefault();
+        const formData = {
+            id: document.getElementById('id').value,
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            address: document.getElementById('address').value,
+            phoneNumber: document.getElementById('phoneNumber').value
+        };
+
+        try {
+            const response = await fetch('/api/users/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.text();
+            if (result.includes('updated')) {
+                alert('Details updated successfully!');
+                location.href = /*[[@{/}]]*/ "";
+            } else {
+                alert(result);
+            }
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+        }
+        return false;
+    }
+</script>
+
+</body>
+</html> 

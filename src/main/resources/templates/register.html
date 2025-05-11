@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Register</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+
+<nav>
+    <span>🍔 ByteEats</span>
+    <div>
+        <button onclick="location.href='/'">Home</button>
+    </div>
+</nav>
+
+<div class="form-container">
+    <h2>Register</h2>
+    <form id="registerForm" onsubmit="return handleRegister(event)">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" required>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a th:href="@{/login}">Login here</a></p>
+</div>
+
+<script th:inline="javascript">
+    async function handleRegister(event) {
+        event.preventDefault();
+        const formData = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            address: document.getElementById('address').value,
+            phoneNumber: document.getElementById('phoneNumber').value
+        };
+
+        try {
+            const response = await fetch('/api/users/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.text();
+            if (result.includes('registered')) {
+                alert('Registration successful! Please login.');
+                location.href = /*[[@{/login}]]*/ "";
+            } else {
+                alert(result);
+            }
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+        }
+        return false;
+    }
+</script>
+
+</body>
+</html> 

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Login</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+
+<nav>
+    <span>🍔 ByteEats</span>
+    <div>
+        <button onclick="location.href='/'">Home</button>
+    </div>
+</nav>
+
+<div class="form-container">
+    <h2>Login</h2>
+    <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
+</div>
+
+<script th:inline="javascript">
+    async function handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('/api/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.text();
+            if (result.startsWith('Login success')) {
+                const [_, userInfo] = result.split(': ');
+                const [username, role] = userInfo.split(' (');
+                localStorage.setItem('username', username);
+                localStorage.setItem('role', role.replace(')', ''));
+                
+                if (role.includes('restaurant')) {
+                    location.href = /*[[@{/owner-home}]]*/ "";
+                } else {
+                    location.href = /*[[@{/}]]*/ "";
+                }
+            } else {
+                alert('Login failed. Please check your credentials.');
+            }
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+        }
+        return false;
+    }
+</script>
+
+</body>
+</html> 

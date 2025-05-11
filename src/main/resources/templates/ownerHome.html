@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Restaurant Owner</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+
+<nav>
+    <span>🍔 ByteEats</span>
+    <div>
+        <button id="logoutBtn">Logout</button>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>Restaurant Owner Dashboard</h2>
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3>Orders</h3>
+            <p>No new orders</p>
+        </div>
+        <div class="card">
+            <h3>Menu</h3>
+            <button onclick="location.href='#'">Manage Menu</button>
+        </div>
+        <div class="card">
+            <h3>Profile</h3>
+            <button onclick="location.href='#'">Update Details</button>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    logoutBtn.onclick = () => {
+        localStorage.clear();
+        location.href = /*[[@{/}]]*/ "";
+    };
+</script>
+
+</body>
+</html> 

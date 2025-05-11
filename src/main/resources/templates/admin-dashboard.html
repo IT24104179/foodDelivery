@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ByteEats • Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+
+<nav>
+    <span>🍔 ByteEats</span>
+    <div>
+        <button id="logoutBtn">Logout</button>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>Admin Dashboard</h2>
+    
+    <div class="user-list">
+        <h3>All Users</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.role}"></td>
+                    <td>
+                        <button th:onclick="'editUser(\'' + ${user.id} + '\')'">Edit</button>
+                        <button th:onclick="'deleteUser(\'' + ${user.id} + '\')'">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    logoutBtn.onclick = () => {
+        localStorage.clear();
+        location.href = /*[[@{/}]]*/ "";
+    };
+
+    async function editUser(id) {
+        location.href = /*[[@{/update-details}]]*/ "" + '?id=' + id;
+    }
+
+    async function deleteUser(id) {
+        if (confirm('Are you sure you want to delete this user?')) {
+            try {
+                const response = await fetch('/api/users/delete/' + id, {
+                    method: 'DELETE'
+                });
+                const result = await response.text();
+                if (result.includes('deleted')) {
+                    location.reload();
+                } else {
+                    alert(result);
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again.');
+            }
+        }
+    }
+</script>
+
+</body>
+</html> 
