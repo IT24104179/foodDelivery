@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Reviews</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #81C784;
+            --secondary: #FF7043;
+            --light: #F5F5F5;
+        }
+        body {
+            background-color: var(--light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: var(--primary) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 30px;
+        }
+        .page-header {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .review-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+        .card-body {
+            padding: 25px;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .review-user {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .review-target {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .review-target strong {
+            color: var(--secondary);
+        }
+        .review-comment {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        .rating-badge {
+            background-color: var(--secondary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">Food Delivery</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/reviews/submit">Submit Review</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/reviews/all">All Reviews</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/reviews/admin/all">Admin Reviews</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="page-header">All Reviews</h1>
+
+    <div th:if="${reviews.isEmpty()}" class="empty-state">
+        <h3>No reviews yet</h3>
+        <p>Be the first to share your experience!</p>
+        <a href="/reviews/submit" class="btn btn-primary mt-3">Submit Review</a>
+    </div>
+
+    <div class="row">
+        <div th:each="review : ${reviews}" class="col-md-6 col-lg-4 mb-4">
+            <div class="card review-card">
+                <div class="card-body">
+                    <div class="review-header">
+                        <span class="review-user" th:text="${review.userEmail}"></span>
+                        <span class="rating-badge" th:text="${review.rating} + '/5'"></span>
+                    </div>
+                    <div class="review-target">
+                        <strong th:text="${review.targetType}"></strong>:
+                        <span th:text="${review.targetId}"></span>
+                    </div>
+                    <div class="review-comment" th:text="${review.comment}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
