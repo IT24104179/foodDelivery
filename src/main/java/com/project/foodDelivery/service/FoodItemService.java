@@ -1,10 +1,11 @@
-package com.foodDelivery.project.service;
+package com.project.foodDelivery.service;
 
 import com.foodDelivery.project.model.FoodItem;
-import com.foodDelivery.project.model.NonVegItem;
-import com.foodDelivery.project.model.VegItem;
-import com.foodDelivery.project.repository.FoodItemRepository;
 
+
+import com.project.foodDelivery.model.NonVegItem;
+import com.project.foodDelivery.model.VegItem;
+import com.project.foodDelivery.repository.FoodItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,10 +52,10 @@ public class FoodItemService {
         // Create appropriate food item based on type
         if ("veg".equals(type)) {
             boolean containsDairy = "true".equals(additionalInfo);
-            foodItem = new VegItem(UUID.randomUUID().toString(), name, price, description, 
+            foodItem = new VegItem(UUID.randomUUID().toString(), name, price, description,
                                   imageUrl, available, containsDairy);
         } else if ("non-veg".equals(type)) {
-            foodItem = new NonVegItem(UUID.randomUUID().toString(), name, price, description, 
+            foodItem = new NonVegItem(UUID.randomUUID().toString(), name, price, description,
                                      imageUrl, available, additionalInfo); // additionalInfo is meatType
         } else {
             foodItem = new FoodItem(UUID.randomUUID().toString(), name, price, description, 

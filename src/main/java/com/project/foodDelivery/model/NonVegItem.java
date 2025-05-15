@@ -1,6 +1,6 @@
-package com.foodDelivery.project.model;
+package com.project.foodDelivery.model;
 
-public class NonVegItem extends FoodItem {
+public class NonVegItem extends com.foodDelivery.project.model.FoodItem {
     private static final long serialVersionUID = 1L;
     
     private String meatType; // chicken, beef, pork, etc.

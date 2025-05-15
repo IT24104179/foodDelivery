@@ -1,14 +1,14 @@
-package com.foodDelivery.project.repository;
+package com.project.foodDelivery.repository;
 
 import com.foodDelivery.project.model.FoodItem;
-import com.foodDelivery.project.model.NonVegItem;
-import com.foodDelivery.project.model.VegItem;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.project.foodDelivery.model.NonVegItem;
+import com.project.foodDelivery.model.VegItem;
 import org.springframework.stereotype.Repository;
 
 @Repository

@@ -1,6 +1,6 @@
-package com.foodDelivery.project.model;
+package com.project.foodDelivery.model;
 
-public class VegItem extends FoodItem {
+public class VegItem extends com.foodDelivery.project.model.FoodItem {
     private static final long serialVersionUID = 1L;
     
     private boolean containsDairy;
