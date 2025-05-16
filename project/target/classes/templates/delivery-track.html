@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Track Deliveries</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Active Deliveries</h1>
+        <table class="w-full bg-white shadow-md rounded">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="py-2 px-4">Delivery ID</th>
+                    <th class="py-2 px-4">Order ID</th>
+                    <th class="py-2 px-4">Delivery Person</th>
+                    <th class="py-2 px-4">Status</th>
+                    <th class="py-2 px-4">Assigned Time</th>
+                    <th class="py-2 px-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="delivery : ${activeDeliveries}" class="border-b">
+                    <td class="py-2 px-4" th:text="${delivery.deliveryId}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.orderId}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.deliveryPersonId}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.status}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.assignedTime != null ? #temporals.format(delivery.assignedTime, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}"></td>
+                    <td class="py-2 px-4">
+                        <form th:action="@{/delivery/update-status}" method="post" class="inline">
+                            <input type="hidden" name="deliveryId" th:value="${delivery.deliveryId}">
+                            <select name="newStatus" class="mr-2">
+                                <option value="Picked Up">Picked Up</option>
+                                <option value="In Transit">In Transit</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mt-4 space-x-4">
+            <a href="/delivery/assign" class="text-blue-500 hover:underline">Assign New Delivery</a>
+            <a href="/delivery/history" class="text-blue-500 hover:underline">View Delivery History</a>
+        </div>
+    </div>
+</body>
+</html>

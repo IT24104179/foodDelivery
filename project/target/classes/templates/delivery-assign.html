@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Assign Delivery</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto max-w-md">
+        <h1 class="text-2xl font-bold mb-4">Assign Delivery</h1>
+        <form th:action="@{/delivery/assign}" method="post" class="bg-white p-6 rounded shadow-md">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="orderId">Order ID</label>
+                <input type="text" id="orderId" name="orderId" required 
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="deliveryPersonId">Delivery Person ID</label>
+                <input type="text" id="deliveryPersonId" name="deliveryPersonId" required 
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Assign Delivery
+            </button>
+        </form>
+        <div class="mt-4">
+            <a href="/delivery/track" class="text-blue-500 hover:underline">View Active Deliveries</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Delivery Personnel Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Delivery Personnel Dashboard</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-3">Active Deliveries</h2>
+                <ul>
+                    <li th:each="delivery : ${activeDeliveries}" class="mb-2 pb-2 border-b">
+                        <div class="flex justify-between">
+                            <span th:text="${'Order ID: ' + delivery.orderId}"></span>
+                            <span th:text="${'Status: ' + delivery.status}" 
+                                  class="font-bold" 
+                                  th:classappend="${delivery.status == 'Picked Up' ? 'text-yellow-600' : 
+                                                   delivery.status == 'In Transit' ? 'text-blue-600' : 
+                                                   'text-green-600'}"></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-3">Quick Actions</h2>
+                <div class="space-y-3">
+                    <a href="/delivery/assign" class="block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center">
+                        Assign New Delivery
+                    </a>
+                    <a href="/delivery/track" class="block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-center">
+                        Track Active Deliveries
+                    </a>
+                    <a href="/delivery/history" class="block bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-center">
+                        View Delivery History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
