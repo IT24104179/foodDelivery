@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Food</title>
+    <style>
+        body {
+            background-color: #F1EFEC;
+            font-family: Arial, sans-serif;
+            color: #030303;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #D4C9BE;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        h2 {
+            color: #123458;
+            text-align: center;
+        }
+        input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #123458;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #102e4a;
+        }
+        .foodItemEntry {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .foodItemEntry label {
+            margin-top: 5px;
+        }
+        #orderSummary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e0d8d0;
+            border-radius: 5px;
+            display: none;
+        }
+        #orderSummary h3 {
+            text-align: center;
+        }
+        #orderSummary ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #orderSummary li {
+            padding: 5px 0;
+            border-bottom: 1px dashed #123458;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #123458;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Place Your Order</h2>
+    <div id="foodItemsContainer">
+        <div class="foodItemEntry">
+            <label>Category:</label>
+            <select class="foodCategory">
+                <option value="Rice" data-price="300">Rice (Rs.300)</option>
+                <option value="Curry" data-price="150">Curry (Rs.150)</option>
+                <option value="Kottu" data-price="400">Kottu (Rs.400)</option>
+            </select>
+            <label>Size:</label>
+            <select class="foodSize">
+                <option value="Small" data-price="0">Small</option>
+                <option value="Medium" data-price="100">Medium (+Rs.100)</option>
+                <option value="Large" data-price="200">Large (+Rs.200)</option>
+            </select>
+            <label>Toppings:</label>
+            <select class="foodTopping">
+                <option value="None" data-price="0">None</option>
+                <option value="Cheese" data-price="50">Cheese (+Rs.50)</option>
+                <option value="Egg" data-price="30">Egg (+Rs.30)</option>
+                <option value="Sausage" data-price="70">Sausage (+Rs.70)</option>
+            </select>
+            <label>Quantity:</label>
+            <input type="number" class="foodQuantity" value="1" placeholder="Quantity" />
+        </div>
+    </div>
+    <button id="addFoodItem">Add Another Item</button>
+    <input type="hidden" id="orderId" value="" />
+    <input type="hidden" id="userId" value="123" />
+    <button onclick="submitOrder()">Submit Order</button>
+    <button onclick="updateOrder()" style="display:none;" id="updateOrderButton">Update Order</button>
+    <div id="orderSummary" style="display:none;">
+        <h3>Order Summary</h3>
+        <ul id="orderItemsList"></ul>
+        <p id="orderTotal"></p>
+    </div>
+    <p id="result"></p>
+    <button id="viewOrdersButton" onclick="viewOrders()">View Orders</button>
+</div>
+<script>
+    const foodItemsContainer = document.getElementById('foodItemsContainer');
+    const orderSummaryDiv = document.getElementById('orderSummary');
+    const orderItemsList = document.getElementById('orderItemsList');
+    const orderTotalElement = document.getElementById('orderTotal');
+    const resultElement = document.getElementById('result');
+    const orderIdField = document.getElementById('orderId');
+    const updateOrderButton = document.getElementById('updateOrderButton');
+    let foodItemCounter = 1;
+
+    // Move this event listener outside of editOrder()
+    document.getElementById('addFoodItem').addEventListener('click', () => {
+        foodItemCounter++;
+        const entry = document.createElement('div');
+        entry.className = 'foodItemEntry';
+        entry.innerHTML = `
+                <label>Category:</label>
+                <select class="foodCategory">
+                    <option value="Rice" data-price="300">Rice (Rs.300)</option>
+                    <option value="Curry" data-price="150">Curry (Rs.150)</option>
+                    <option value="Kottu" data-price="400">Kottu (Rs.400)</option>
+                </select>
+                <label>Size:</label>
+                <select class="foodSize">
+                    <option value="Small" data-price="0">Small</option>
+                    <option value="Medium" data-price="100">Medium (+Rs.100)</option>
+                    <option value="Large" data-price="200">Large (+Rs.200)</option>
+                </select>
+                <label>Toppings:</label>
+                <select class="foodTopping">
+                    <option value="None" data-price="0">None</option>
+                    <option value="Cheese" data-price="50">Cheese (+Rs.50)</option>
+                    <option value="Egg" data-price="30">Egg (+Rs.30)</option>
+                    <option value="Sausage" data-price="70">Sausage (+Rs.70)</option>
+                </select>
+                <label>Quantity:</label>
+                <input type="number" class="foodQuantity" value="1" placeholder="Quantity" />
+            `;
+        foodItemsContainer.appendChild(entry);
+    });
+
+    function submitOrder() {
+        const entries = document.querySelectorAll('.foodItemEntry');
+        const foodItems = [];
+        let total = 0;
+
+        entries.forEach(entry => {
+            const categorySelect = entry.querySelector('.foodCategory');
+            const sizeSelect = entry.querySelector('.foodSize');
+            const toppingSelect = entry.querySelector('.foodTopping');
+            const quantity = parseInt(entry.querySelector('.foodQuantity').value) || 0;
+
+            const category = categorySelect.value;
+            const categoryPrice = parseFloat(categorySelect.options[categorySelect.selectedIndex].dataset.price) || 0;
+            const sizeText = sizeSelect.options[sizeSelect.selectedIndex].value;
+            const sizeExtra = parseFloat(sizeSelect.options[sizeSelect.selectedIndex].dataset.price) || 0;
+            const toppingText = toppingSelect.options[toppingSelect.selectedIndex].value;
+            const toppingExtra = parseFloat(toppingSelect.options[toppingSelect.selectedIndex].dataset.price) || 0;
+
+            const finalPrice = categoryPrice + sizeExtra + toppingExtra;
+            const itemTotal = finalPrice * quantity;
+            total += itemTotal;
+
+            foodItems.push({
+                name: `${category} (${sizeText}, ${toppingText})`,
+                price: finalPrice,
+                quantity
+            });
+        });
+
+        if (foodItems.length === 0 || total === 0) {
+            resultElement.innerText = "Please enter valid item details.";
+            return;
+        }
+
+        const orderId = orderIdField.value;
+        const userId = document.getElementById('userId').value;
+        const order = {
+            orderId: orderId,
+            userId: userId,
+            totalPrice: total,
+            foodItems: foodItems
+        };
+
+        const url = orderId ? `http://localhost:8081/orders/${orderId}` : 'http://localhost:8081/orders';
+        const method = orderId ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => {
+                        throw new Error(text)
+                    });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (orderId) {
+                    resultElement.innerText = "Order updated! Order ID: " + data.orderId;
+                } else {
+                    resultElement.innerText = "Order placed! Order ID: " + data.orderId;
+                }
+                displayOrderSummary(foodItems, total, data.orderId);
+                orderIdField.value = data.orderId;
+                updateOrderButton.style.display = 'block';
+            })
+            .catch(error => {
+                resultElement.innerText = "Error placing/updating order: " + error.message;
+                console.error('Error:', error);
+            });
+    }
+
+    function displayOrderSummary(foodItems, total, orderId) {
+        orderItemsList.innerHTML = '';
+        foodItems.forEach(item => {
+            const li = document.createElement('li');
+            li.innerText = `${item.name} x ${item.quantity} - Rs.${(item.price * item.quantity).toFixed(2)}`;
+            orderItemsList.appendChild(li);
+        });
+        orderTotalElement.innerText = `Total: Rs.${total.toFixed(2)}`;
+        orderSummaryDiv.style.display = 'block';
+    }
+
+    function viewOrders() {
+        fetch('http://localhost:8081/orders')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.length === 0) {
+                    resultElement.innerText = "No orders found.";
+                } else {
+                    displayAllOrders(data);
+                }
+            })
+            .catch(error => {
+                resultElement.innerText = "Error fetching orders: " + error.message;
+                console.error('Error:', error);
+            });
+    }
+
+    function displayAllOrders(orders) {
+        let ordersDisplay = "<h2>All Orders</h2><ul>";
+        orders.forEach(order => {
+            ordersDisplay += `<li><b>Order ID:</b> ${order.orderId}, <b>User ID:</b> ${order.userId ?? "N/A"}, <b>Total Price:</b> Rs.${order.totalPrice.toFixed(2)}, <b>Time:</b> ${new Date(order.time).toLocaleString()}<ul>`;
+            order.foodItems.forEach(item => {
+                ordersDisplay += `<li>${item.name} x ${item.quantity} - Rs.${(item.price * item.quantity).toFixed(2)}</li>`;
+            });
+            ordersDisplay += `</ul><button onclick="editOrder(${order.orderId})">Edit Order</button></li>`;
+        });
+        ordersDisplay += "</ul>";
+        resultElement.innerHTML = ordersDisplay;
+    }
+
+    function editOrder(orderId) {
+        fetch(`http://localhost:8081/orders/${orderId}`)
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text)
+                    });
+                }
+                return response.json();
+            })
+            .then(order => {
+                orderIdField.value = order.orderId;
+                updateOrderButton.style.display = 'block';
+                foodItemsContainer.innerHTML = ''; // Clear existing items
+                foodItemCounter = 0; //reset foodItemCounter
+                order.foodItems.forEach(item => {
+                    foodItemCounter++;
+                    const entry = document.createElement('div');
+                    entry.className = 'foodItemEntry';
+                    entry.innerHTML = `
+                            <label>Category:</label>
+                            <select class="foodCategory">
+                                <option value="Rice" data-price="300">Rice (Rs.300)</option>
+                                <option value="Curry" data-price="150">Curry (Rs.150)</option>
+                                <option value="Kottu" data-price="400">Kottu (Rs.400)</option>
+                            </select>
+                            <label>Size:</label>
+                            <select class="foodSize">
+                                <option value="Small" data-price="0">Small</option>
+                                <option value="Medium" data-price="100">Medium (+Rs.100)</option>
+                                <option value="Large" data-price="200">Large (+Rs.200)</option>
+                            </select>
+                            <label>Toppings:</label>
+                            <select class="foodTopping">
+                                <option value="None" data-price="0">None</option>
+                                <option value="Cheese" data-price="50">Cheese (+Rs.50)</option>
+                                <option value="Egg" data-price="30">Egg (+Rs.30)</option>
+                                <option value="Sausage" data-price="70">Sausage (+Rs.70)</option>
+                            </select>
+                            <label>Quantity:</label>
+                            <input type="number" class="foodQuantity" value="${item.quantity}" placeholder="Quantity" />
+                        `;
+                    const categorySelect = entry.querySelector('.foodCategory');
+                    const sizeSelect = entry.querySelector('.foodSize');
+                    const toppingSelect = entry.querySelector('.foodTopping');
+                    let categoryOptionFound = false;
+                    let sizeOptionFound = false;
+                    let toppingOptionFound = false;
+                    for (let option of categorySelect.options) {
+                        if (item.name.startsWith(option.value)) {
+                            categorySelect.value = option.value;
+                            categoryOptionFound = true;
+                            break;
+                        }
+                    }
+                    const sizeMatch = item.name.match(/\(Size: ([^,]+)/);
+                    if (sizeMatch) {
+                        const sizeValue = sizeMatch[1];
+                        for (let option of sizeSelect.options) {
+                            if (option.value === sizeValue) {
+                                sizeSelect.value = sizeValue;
+                                sizeOptionFound = true;
+                                break;
+                            }
+                        }
+                    }
+                    const toppingMatch = item.name.match(/Toppings: ([^)]+)/);
+                    if (toppingMatch) {
+                        const toppingValue = toppingMatch[1];
+                        for (let option of toppingSelect.options) {
+                            if (option.value === toppingValue) {
+                                toppingSelect.value = toppingValue;
+                                toppingOptionFound = true;
+                                break;
+                            }
+                        }
+                    }
+                    foodItemsContainer.appendChild(entry);
+                });
+                const addFoodItemButton = document.createElement('button');
+                addFoodItemButton.id = 'addFoodItem';
+                addFoodItemButton.innerText = 'Add Another Item';
+                addFoodItemButton.addEventListener('click', () => {
+                    foodItemCounter++;
+                    const newFoodItemEntry = document.createElement('div');
+                    newFoodItemEntry.className = 'foodItemEntry';
+                    newFoodItemEntry.innerHTML = `
+                            <label>Category:</label>
+                            <select class="foodCategory">
+                                <option value="Rice" data-price="300">Rice (Rs.300)</option>
+                                <option value="Curry" data-price="150">Curry (Rs.150)</option>
+                                <option value="Kottu" data-price="400">Kottu (Rs.400)</option>
+                            </select>
+                            <label>Size:</label>
+                            <select class="foodSize">
+                                <option value="Small" data-price="0">Small</option>
+                                <option value="Medium" data-price="100">Medium (+Rs.100)</option>
+                                <option value="Large" data-price="200">Large (+Rs.150)</option>
+                            </select>
+                            <label>Toppings:</label>
+                            <select class="foodTopping">
+                                <option value="None" data-price="0">None</option>
+                                <option value="Cheese" data-price="50">Cheese (+Rs.50)</option>
+                                <option value="Egg" data-price="30">Egg (+Rs.30)</option>
+                                <option value="Sausage" data-price="70">Sausage (+Rs.70)</option>
+                            </select>
+                            <label>Quantity:</label>
+                            <input type="number" class="foodQuantity" value="1" placeholder="Quantity" />
+                        `;
+                    foodItemsContainer.appendChild(newFoodItemEntry);
+                });
+                foodItemsContainer.appendChild(addFoodItemButton);
+            })
+            .catch(error => {
+                resultElement.innerText = "Error fetching order for editing: " + error.message;
+                console.error('Error:', error);
+            });
+    }
+
+    function updateOrder() {
+        submitOrder();
+    }
+</script>
+</body>
+</html>
