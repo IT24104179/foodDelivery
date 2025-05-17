@@ -57,7 +57,7 @@ public class UserFileHandler {
                 .findFirst() 
                 .orElse(null);
     }
-    //update method
+    
     public static void updateUser(User updatedUser) {
         List<User> users = readAllUsers();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
