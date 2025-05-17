@@ -1,2 +1,0 @@
-123e4567-e89b-12d3-a456-426614174000,Owner,owner@123,admin123,owner,Head Office,0710000000
-3db89482-e81a-4193-9e11-c90be32b500c,Yasindu,yasi17994@gmail.com,123,customer,Liyanage stores Kandy road,0713576886
