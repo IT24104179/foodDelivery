@@ -16,14 +16,14 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
-    // Show submission form
+    
     @GetMapping("/submit")
     public String showForm(Model model) {
         model.addAttribute("review", new Review());
         return "submit-review";
     }
 
-    // Handle form submission
+    
     @PostMapping("/submit")
     public String submit(@ModelAttribute Review review) {
         reviewService.submitReview(
@@ -36,7 +36,7 @@ public class ReviewController {
         return "redirect:/reviews/view/" + review.getTargetType() + "/" + review.getTargetId();
     }
 
-    // View reviews for a specific target
+   
     @GetMapping("/view/{type}/{id}")
     public String viewReviews(@PathVariable("type") String targetType,
                               @PathVariable("id") String targetId,
@@ -48,7 +48,7 @@ public class ReviewController {
         return "view-reviews";
     }
 
-    // Show edit form
+    
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable("id") String reviewId, Model model) {
         Review review = reviewService.getReviewById(reviewId);
@@ -56,14 +56,14 @@ public class ReviewController {
         return "edit-review";
     }
 
-    // Handle edit form submission
+    
     @PostMapping("/update")
     public String update(@ModelAttribute Review review) {
         reviewService.updateReview(review);
         return "redirect:/reviews/view/" + review.getTargetType() + "/" + review.getTargetId();
     }
 
-    // Delete a review
+    
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") String reviewId) {
         Review review = reviewService.getReviewById(reviewId);
@@ -73,7 +73,7 @@ public class ReviewController {
         return "redirect:/reviews/view/" + type + "/" + target;
     }
 
-    // Admin: view all
+    
     @GetMapping("/admin/all")
     public String viewAllReviewsAdmin(Model model) {
         List<Review> allReviews = reviewService.getAllReviews();
