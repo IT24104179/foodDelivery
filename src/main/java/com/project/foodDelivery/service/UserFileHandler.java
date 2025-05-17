@@ -5,16 +5,16 @@ import com.project.foodDelivery.model.Customer;
 import com.project.foodDelivery.model.RestaurantOwner;
 import com.project.foodDelivery.model.User;
 
-import java.io.*; // bufferWriter/reader,filewritter/reader,IOexception
+import java.io.*; 
 import java.util.ArrayList;
-import java.util.List; //List and stream
+import java.util.List; 
 
 public class UserFileHandler {
-    private static final String FILE_PATH = "users.txt"; // since this is static,don't need to make an object to access it
+    private static final String FILE_PATH = "users.txt"; 
 
-    // create method
+    
     public static void saveUser(User user) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) { //append mode, meaning new data is added to the end of the file instead of overwriting it
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) { 
             writer.write(user.toFileString());
             writer.newLine();
         } catch (IOException e) {
@@ -22,15 +22,14 @@ public class UserFileHandler {
         }
     }
 
-    // read method
+    
     public static List<User> readAllUsers() {
-        List<User> users = new ArrayList<>(); //Creates an empty ArrayList to store User objects
+        List<User> users = new ArrayList<>(); 
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
-            while ((line = br.readLine()) != null) {//Reads the file line by line until reaching the end
-                String[] p = line.split(",", -1);//Splits each line by comma and put them into an array.-1 means spaces are included.
-                if (p.length < 7) continue; // it skips lines which has fields less than 7 to avoid errors
-
+            while ((line = br.readLine()) != null) {
+                String[] p = line.split(",", -1);
+                if (p.length < 7) continue; 
                 String id       = p[0];
                 String userName = p[1];
                 String email    = p[2];
@@ -51,11 +50,11 @@ public class UserFileHandler {
         return users;
     }
 
-    //find method
+    
     public static User findUserById(String id) {
-        return readAllUsers().stream()//Converts the list of users into a stream so we can search through it easily.
-                .filter(u -> u.getId().equals(id)) //this has a lambda expression similar to arrow function
-                .findFirst() //  find the first matching user
+        return readAllUsers().stream()
+                .filter(u -> u.getId().equals(id)) 
+                .findFirst() 
                 .orElse(null);
     }
     //update method
@@ -74,13 +73,13 @@ public class UserFileHandler {
             e.printStackTrace();
         }
     }
-    //delete method
+    
     public static void deleteUser(String id) {
         List<User> users = readAllUsers();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (User user : users) {
                 if (!user.getId().equals(id)) {
-                    writer.write(user.toFileString()); //overwrite all users except the one we want to delete.
+                    writer.write(user.toFileString()); 
                     writer.newLine();
                 }
             }
