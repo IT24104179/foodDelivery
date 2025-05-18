@@ -4,6 +4,8 @@ import com.project.foodDelivery.model.Customer;
 import com.project.foodDelivery.model.RestaurantOwner;
 import com.project.foodDelivery.model.User;
 import com.project.foodDelivery.service.UserFileHandler;
+import com.project.foodDelivery.service.FoodItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/") // all URLs start from /
 public class UserController {
 
+    @Autowired
+    private FoodItemService foodItemService;
 
     //page routes
     @GetMapping("/")
     public String home(Model model) {
+        model.addAttribute("foodItems", foodItemService.getAllFoodItems());
         return "home";
     } //Model model lets send data to HTML pages
 
@@ -40,8 +45,8 @@ public class UserController {
     }
 
     @GetMapping("/customer-home")
-    public String customerHome() {
-        // Only customers can access this page, others will be redirected to login
+    public String customerHome(Model model) {
+        model.addAttribute("foodItems", foodItemService.getAllFoodItems());
         return "customerHome";
     }
 
@@ -56,7 +61,15 @@ public class UserController {
         return "update-details";
     }
 
+    @GetMapping("/orders")
+    public String ordersPage() {
+        return "orders";
+    }
 
+    @GetMapping("/about")
+    public String aboutPage() {
+        return "about";
+    }
 
     // API endpoints
     @PostMapping("/api/users/register") //Handles POST requests sent to URL
