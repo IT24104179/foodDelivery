@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Snak Sprint • Payment Records</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body { background: #F1EFEC; font-family: Arial, sans-serif; }
+        .container { max-width: 1200px; margin: 2rem auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 2rem; }
+        h1 { color: #123458; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { padding: 0.75rem; border: 1px solid #D4C9BE; text-align: left; }
+        th { background: #123458; color: #fff; }
+        tr:nth-child(even) { background: #F1EFEC; }
+        .btn-primary { background: #123458; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
+        .btn-primary:hover { background: #0a1f33; }
+        .btn-outline { background: transparent; color: #123458; border: 1px solid #123458; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
+        .btn-outline:hover { background: #123458; color: white; }
+        .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
+        .badge-success { background-color: #10b981; color: white; }
+        .alert-success { background-color: #d1fae5; border: 1px solid #10b981; color: #047857; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; }
+        .nav-link {
+            color: #123458;
+            text-decoration: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            margin: 0 0.1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: #123458;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(18,52,88,0.08);
+        }
+        .nav-btn {
+            background: #fff;
+            color: #123458;
+            border: 1px solid #d4c9be;
+            border-radius: 6px;
+            padding: 0.45rem 1.1rem;
+            font-weight: 500;
+            font-size: 1.02rem;
+            margin-left: 0.2rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(18,52,88,0.04);
+        }
+        .nav-btn:hover {
+            background: #123458;
+            color: #fff;
+            border-color: #123458;
+        }
+        .logout-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: 1px solid #e74c3c;
+            margin-left: 0.5rem;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+<nav style="backdrop-filter: blur(8px); background: rgba(212,201,190,0.95); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-radius: 0 0 18px 18px; margin-bottom: 2rem;">
+    <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0.7rem 2rem;">
+        <div class="logo" style="font-size: 1.7rem; font-weight: bold; color: #123458; letter-spacing: 1px;">🍔 Snak Sprint</div>
+        <div class="nav-buttons" style="display: flex; align-items: center; gap: 0.5rem;">
+            <a href="/" class="nav-btn" id="homeBtn">Home</a>
+            <a href="/payments" class="nav-btn" id="paymentsBtn">Payments</a>
+            <a href="#" id="ordersBtn" class="nav-btn">My Orders</a>
+            <a href="#" id="logoutBtn" class="nav-btn logout-btn">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div th:if="${success}" class="alert-success">
+        <span th:text="${success}"></span>
+        <button type="button" class="float-right" onclick="this.parentElement.style.display='none'">×</button>
+    </div>
+
+    <button class="back-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4" onclick="location.href='/owner-home'">&larr; Back to Dashboard</button>
+
+    <div class="bg-white shadow-md rounded p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold"><i class="bi bi-credit-card"></i> Payment Records</h1>
+            <a href="/payments/new" class="btn-primary">
+                <i class="bi bi-plus-circle"></i> Add New Payment
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Order ID</th>
+                    <th>Amount (LKR)</th>
+                    <th>Card Type</th>
+                    <th>Card Last 4</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="payment : ${payments}">
+                    <td th:text="${payment.paymentId}"></td>
+                    <td th:text="${payment.orderId}"></td>
+                    <td th:text="${#numbers.formatDecimal(payment.amount, 1, 2) + ' LKR'}"></td>
+                    <td th:text="${payment.cardType}"></td>
+                    <td th:text="'**** ' + ${#strings.substring(payment.cardNumber, 12, 16)}"></td>
+                    <td>
+                        <span class="badge badge-success" th:text="${payment.paymentStatus}"></span>
+                    </td>
+                    <td th:text="${payment.paymentDate}"></td>
+                    <td>
+                        <a th:href="@{/payments/{id}(id=${payment.paymentId})}" class="btn-outline text-sm">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auth check - allow both customers and owners
+    const role = localStorage.getItem('role');
+    if (!role || (role !== 'owner' && role !== 'customer')) {
+        alert('Please log in to continue.');
+        location.href = '/login';
+    }
+    // Navigation based on role
+    const homeBtn = document.getElementById('homeBtn');
+    const paymentsBtn = document.getElementById('paymentsBtn');
+    const ordersBtn = document.getElementById('ordersBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (role === 'owner') {
+        homeBtn.href = '/owner-home';
+        ordersBtn.href = '/orders';
+        document.querySelector('.back-btn').onclick = () => location.href = '/owner-home';
+    } else {
+        homeBtn.href = '/customer-home';
+        ordersBtn.onclick = () => {
+            // For customers, redirect to customer home and open orders modal
+            localStorage.setItem('openOrders', 'true');
+            location.href = '/customer-home';
+        };
+        document.querySelector('.back-btn').onclick = () => location.href = '/customer-home';
+        
+        // For customers, only show their own payments
+        const customerId = localStorage.getItem('id');
+        if (customerId) {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                // Hide payments that don't belong to this customer
+                // This is a simple client-side filter - ideally this would be done server-side
+                const customerEmail = localStorage.getItem('email');
+                if (customerEmail && !row.innerHTML.includes(customerEmail)) {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    }
+    
+    // Logout
+    logoutBtn.onclick = () => { localStorage.clear(); location.href = '/'; };
+</script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Snak Sprint • All Orders</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        body { background: #F1EFEC; font-family: Arial, sans-serif; }
+        .container { max-width: 1200px; margin: 2rem auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 2rem; }
+        h2 { color: #123458; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { padding: 0.75rem; border: 1px solid #D4C9BE; text-align: left; }
+        th { background: #123458; color: #fff; }
+        tr:nth-child(even) { background: #F1EFEC; }
+        button { padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #ccc; }
+        .deliver-btn { background: #4CAF50; color: white; border: 1px solid #4CAF50; margin: 0 2px; cursor: pointer; }
+        .deliver-btn:hover { background: #45a049; }
+        .payment-btn { background: #3498db; color: white; border: 1px solid #3498db; margin: 0 2px; cursor: pointer; }
+        .payment-btn:hover { background: #2980b9; }
+        .review-btn { background: #f39c12; color: white; border: 1px solid #f39c12; margin: 0 2px; cursor: pointer; }
+        .review-btn:hover { background: #e67e22; }
+        .payment-status { display: inline-block; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 500; font-size: 0.9rem; }
+        .status-paid { background: #2ecc71; color: #fff; }
+        .status-unpaid { background: #e74c3c; color: #fff; }
+        .track-link { color: #3498db; text-decoration: none; font-weight: 500; }
+        .track-link:hover { text-decoration: underline; }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .status-placed { background: #f1c40f; color: #000; }
+        .status-preparing { background: #3498db; color: #fff; }
+        .status-completed { background: #2ecc71; color: #fff; }
+        .status-cancelled { background: #e74c3c; color: #fff; }
+        .status-delivering { background: #9b59b6; color: #fff; }
+        .back-btn { background: #123458; color: #fff; border: none; padding: 0.5rem 1.2rem; border-radius: 4px; margin-bottom: 1rem; cursor: pointer; }
+        .back-btn:hover { background: #030303; }
+        .nav-link {
+            color: #123458;
+            text-decoration: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            margin: 0 0.1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: #123458;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(18,52,88,0.08);
+        }
+        .nav-btn {
+            background: #fff;
+            color: #123458;
+            border: 1px solid #d4c9be;
+            border-radius: 6px;
+            padding: 0.45rem 1.1rem;
+            font-weight: 500;
+            font-size: 1.02rem;
+            margin-left: 0.2rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(18,52,88,0.04);
+        }
+        .nav-btn:hover, .nav-btn.logout-btn:hover {
+            background: #123458;
+            color: #fff;
+            border-color: #123458;
+        }
+        .logout-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: 1px solid #e74c3c;
+            margin-left: 0.5rem;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+<nav style="backdrop-filter: blur(8px); background: rgba(212,201,190,0.95); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-radius: 0 0 18px 18px; margin-bottom: 2rem;">
+    <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0.7rem 2rem;">
+        <div class="logo" style="font-size: 1.7rem; font-weight: bold; color: #123458; letter-spacing: 1px;">🍔 Snak Sprint</div>
+        <div class="nav-buttons" style="display: flex; align-items: center; gap: 0.5rem;">
+            <a href="#" id="adminDashboardBtn" class="nav-btn">Admin Dashboard</a>
+            <a href="#" id="logoutBtn" class="nav-btn logout-btn">Logout</a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <button class="back-btn" onclick="location.href='/owner-home'">&larr; Back to Dashboard</button>
+    <h2>All Customer Orders</h2>
+    <div id="ordersStatus"></div>
+    <table id="ordersTable">
+        <thead>
+            <tr>
+                <th>Food</th>
+                <th>Qty</th>
+                <th>Address</th>
+                <th>Notes</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Payment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="7">Loading...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Payment Details Modal -->
+<div id="paymentDetailsModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <span class="close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-top: 0; color: #123458;">Payment Details</h2>
+        <div id="paymentDetailsList" style="margin-top: 20px;">
+            <p>Loading payment details...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auth check
+const role = localStorage.getItem('role');
+if (!role || role !== 'owner') {
+    alert('Access denied. Please log in as a restaurant owner.');
+    location.href = '/login';
+}
+// Logout
+const logoutBtn = document.getElementById('logoutBtn');
+logoutBtn.onclick = () => { localStorage.clear(); location.href = '/'; };
+// Admin Dashboard
+const adminDashboardBtn = document.getElementById('adminDashboardBtn');
+adminDashboardBtn.onclick = () => { location.href = '/admin-dashboard'; };
+
+// Fetch and render orders
+async function loadOrders() {
+    const tableBody = document.querySelector('#ordersTable tbody');
+    tableBody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
+    try {
+        const res = await fetch('/api/orders');
+        if (!res.ok) throw new Error('Failed to fetch orders');
+        const orders = await res.json();
+        
+        if (orders.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8">No orders found.</td></tr>';
+            return;
+        }
+        
+        // Sort orders by date in descending order (newest first)
+        orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        
+        // Generate table rows
+        let html = '';
+        orders.forEach(order => {
+            html += `
+            <tr data-order-id="${order.id}">
+                <td>${order.foodName}</td>
+                <td>${order.quantity}</td>
+                <td>${order.address}</td>
+                <td>${order.notes || '-'}</td>
+                <td>${order.customerName}</td>
+                <td>${order.orderDate.replace('T', '<br>')}</td>
+                <td>
+                    <span class="payment-status" data-order-id="${order.id}">Checking...</span>
+                </td>
+                <td>
+                    <div class="flex space-x-2">
+                        ${order.status === 'Completed' || order.status === 'Cancelled' ? '' : 
+                          `<button class="deliver-btn" onclick="location.href='/delivery/assign?orderId=${order.id}'">Deliver</button>`}
+                        <button class="payment-btn" onclick="showPaymentDetails('${order.id}')">Payment Details</button>
+                        ${order.status === 'Completed' ? 
+                          `<button class="review-btn" onclick="location.href='/reviews/submit?targetType=food&targetId=${order.foodItemId}&orderId=${order.id}'">Add Review</button>` : ''}
+                    </div>
+                </td>
+            </tr>`;
+        });
+        
+        tableBody.innerHTML = html;
+        
+        // Check payment status for each order
+        document.querySelectorAll('.payment-status').forEach(async (statusElem) => {
+            const orderId = statusElem.getAttribute('data-order-id');
+            try {
+                const res = await fetch(`/payments/process-payment?orderId=${orderId}`);
+                if (res.ok) {
+                    const status = await res.text();
+                    if (status === 'paid') {
+                        statusElem.textContent = 'Paid';
+                        statusElem.classList.add('status-paid');
+                    } else {
+                        statusElem.textContent = 'Unpaid';
+                        statusElem.classList.add('status-unpaid');
+                    }
+                }
+            } catch (err) {
+                statusElem.textContent = 'Unknown';
+            }
+        });
+        
+        // Payment Details Modal Functions
+        const modal = document.getElementById('paymentDetailsModal');
+        const closeBtn = document.querySelector('.close');
+        const paymentDetailsList = document.getElementById('paymentDetailsList');
+        
+        // Close the modal when clicking the X
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    } catch (err) {
+        tableBody.innerHTML = '<tr><td colspan="7">Error loading orders.</td></tr>';
+    }
+}
+// Function to show payment details
+async function showPaymentDetails(orderId) {
+    const modal = document.getElementById('paymentDetailsModal');
+    const paymentDetailsList = document.getElementById('paymentDetailsList');
+    
+    modal.style.display = 'block';
+    paymentDetailsList.innerHTML = '<p>Loading payment details...</p>';
+    
+    try {
+        // Direct API call to get payment details
+        const res = await fetch(`/api/orders/${orderId}/payments`);
+        if (res.ok) {
+            const payments = await res.json();
+            if (payments.length === 0) {
+                paymentDetailsList.innerHTML = '<p>No payment records found for this order.</p>';
+            } else {
+                let html = '<table style="width:100%; border-collapse: collapse; margin-top: 10px;">';
+                html += '<tr style="background-color: #123458; color: white;">';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Payment ID</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Amount</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Date</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Card</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Status</th>';
+                html += '</tr>';
+                
+                payments.forEach(payment => {
+                    html += `<tr style="border: 1px solid #ddd;">`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.paymentId}</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.amount} LKR</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.paymentDate}</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.cardType} **** ${payment.cardNumber.substring(12)}</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;"><span class="status-paid" style="padding: 4px 8px; border-radius: 4px;">${payment.paymentStatus}</span></td>`;
+                    html += `</tr>`;
+                });
+                
+                html += '</table>';
+                paymentDetailsList.innerHTML = html;
+            }
+        } else {
+            paymentDetailsList.innerHTML = '<p>Failed to load payment details.</p>';
+        }
+    } catch (err) {
+        console.error('Error fetching payment details:', err);
+        paymentDetailsList.innerHTML = '<p>Error loading payment details.</p>';
+    }
+}
+
+window.onload = loadOrders;
+</script>
+</body>
+</html> 

@@ -1,0 +1,237 @@
+/* Import a modern sans-serif font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --primary-color: #123458;
+  --primary-hover: #0e2636;
+  --bg-light: #F1EFEC;
+  --text-dark: #030303;
+  --card-bg: #fff;
+  --accent: #D4C9BE;
+  --radius: 10px;
+  --shadow-light: rgba(18, 52, 88, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* Container utility */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Navbar */
+nav {
+  background: var(--card-bg);
+  padding: 1.2rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px var(--shadow-light);
+  border-radius: var(--radius);
+  margin-bottom: 28px;
+  border: 1px solid var(--accent);
+}
+
+nav span {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+nav button {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px var(--shadow-light);
+}
+
+nav button:hover {
+  background: var(--primary-hover);
+}
+
+/* Welcome text */
+#welcome {
+  margin: 12px 0 24px;
+  font-size: 1.1rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+/* Cards grid */
+.grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* Card component */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px var(--shadow-light);
+  overflow: hidden;
+  border: 1px solid var(--accent);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 8px 24px var(--shadow-light);
+}
+
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card h4, .card h3 {
+  padding: 16px 16px 0 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.card p {
+  padding: 0 16px 16px 16px;
+  color: var(--text-dark);
+}
+
+/* Form elements */
+.form-container {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px var(--shadow-light);
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 32px 28px;
+  border: 1px solid var(--accent);
+}
+
+.form-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+input,
+select,
+button,
+textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.8rem 1rem;
+  margin: 6px 0;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+  color: var(--text-dark);
+}
+
+/* Input focus */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px #12345822;
+}
+
+/* Primary button */
+button {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px var(--shadow-light);
+}
+
+button:hover {
+  background: var(--primary-hover);
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: text-decoration 0.2s;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 4px 16px var(--shadow-light);
+  border: 1px solid var(--accent);
+}
+
+th,
+td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background: var(--accent);
+  font-weight: 600;
+  color: var(--primary-color);
+  position: sticky;
+  top: 0;
+}
+
+tr:nth-child(even) {
+  background: #f8f6f3;
+}
+
+/* Utility: hidden by default */
+.hidden {
+  display: none !important;
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 24px;
+}

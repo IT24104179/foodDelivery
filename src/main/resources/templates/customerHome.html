@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Snak Sprint • Customer Dashboard</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        body {
+            background-color: #F1EFEC;
+            background-image: url('https://images.unsplash.com/photo-1495195134817-033afe8d5f5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+        }
+        .food-item-container {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #123458, #030303);
+            color: #F1EFEC;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .search-bar {
+            max-width: 600px;
+            margin: 1rem auto;
+            display: flex;
+            gap: 1rem;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .search-bar button {
+            padding: 1rem 2rem;
+            background: #123458;
+            color: #F1EFEC;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .search-bar button:hover {
+            background: #030303;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .status-pickedup { background: #e67e22; color: #fff; }
+        .status-intransit { background: #2980b9; color: #fff; }
+        .status-delivered { background: #27ae60; color: #fff; }
+        .track-link {
+            display: inline-block;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 0.3rem;
+        }
+        .track-link:hover { text-decoration: underline; }
+        .food-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            padding: 16px;
+        }
+        .food-item {
+            background: #F1EFEC;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            border-bottom: 1px solid #D4C9BE;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            margin: 0;
+        }
+        .food-item-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .food-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .food-item-content {
+            padding: 1.5rem;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .food-item h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: #123458;
+        }
+        .food-item p {
+            color: #030303;
+            margin: 0 0 1rem 0;
+        }
+        .food-item .price {
+            font-weight: bold;
+            color: #123458;
+            font-size: 1.2rem;
+        }
+        .order-btn {
+            background: #123458;
+            color: #F1EFEC;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        .order-btn:hover {
+            background: #030303;
+        }
+        .review-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .review-btn:hover {
+            background: #45a049;
+        }
+        .review-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        .review-link:hover {
+            text-decoration: underline;
+        }
+        .reviews-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .reviews-section h2,
+        .food-reviews h4 {
+            color: #123458;
+            margin: 1rem 0;
+            padding: 0 1.5rem;
+        }
+        .reviews-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .review-card {
+            background: #F1EFEC;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .review-user {
+            font-weight: 600;
+            color: #123458;
+        }
+        .review-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .review-rating {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        .star {
+            color: #FFD700;
+            font-size: 1.2rem;
+            margin-right: 2px;
+        }
+        .review-comment {
+            line-height: 1.5;
+            color: #333;
+        }
+        .view-all-btn {
+            display: inline-block;
+            background: #123458;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .view-all-btn:hover {
+            background: #0A1E33;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .loading-text {
+            text-align: center;
+            color: #6c757d;
+            padding: 2rem 0;
+        }
+        nav {
+            background: #D4C9BE;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0;
+            width: 100%;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.5rem 1rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #123458;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #123458;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #030303;
+        }
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+        }
+        nav button, .nav-buttons a, .nav-links a {
+            background: transparent;
+            color: #123458;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 500;
+            font-family: inherit;
+        }
+        nav button:hover, .nav-buttons a:hover, .nav-links a:hover {
+            color: #030303;
+            transform: translateY(-2px);
+        }
+        .review-card {
+            background: #F1EFEC;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        .food-reviews {
+            padding: 1rem;
+            background: white;
+        }
+        .review-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem 0;
+        }
+        .add-review-btn {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .add-review-btn:hover {
+            background: #e67e22;
+        }
+        .no-reviews {
+            text-align: center;
+            color: #6c757d;
+            padding: 1rem 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-container">
+        <div class="logo">🍔 Snak Sprint</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            
+            <a href="/reviews/all">Reviews</a>
+            
+        </div>
+        <div class="nav-buttons">
+            <a href="/update-details" id="updateDetailsBtn">Update Details</a>
+            <a href="#" id="myOrdersBtn">My Orders</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="hero-section">
+        <h1 id="welcome-message">Welcome to Snak Sprint</h1>
+        <p>Discover and order your favorite dishes</p>
+        <div class="search-bar">
+            <input type="text" placeholder="Search for dishes or cuisines...">
+            <button>Search</button>
+        </div>
+    </div>
+
+    <div class="food-gallery">
+        <div th:if="${#lists.isEmpty(foodItems)}" class="alert alert-info text-center p-5">
+            <h3>No food items available</h3>
+            <p>Check back soon for delicious dishes!</p>
+        </div>
+        <div th:each="item : ${foodItems}" class="food-item-container">
+            <div class="food-item">
+                <img th:if="${item.imageUrl != null && !item.imageUrl.isEmpty()}"
+                     th:src="@{${item.imageUrl}(v=${#dates.createNow().getTime()})}"
+                     alt="Food Image"
+                     onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=Image+Not+Found';">
+                <img th:if="${item.imageUrl == null || item.imageUrl.isEmpty()}"
+                     src="https://via.placeholder.com/300x200?text=No+Image"
+                     alt="No Image">
+                <div class="food-item-content">
+                    <h4 th:text="${item.name}">Food Name</h4>
+                    <p th:text="${item.description}">Description</p>
+                    <div class="price">Rs. <span th:text="${#numbers.formatDecimal(item.price, 0, 2)}">0.00</span></div>
+                    <button class="order-btn" th:attr="data-food-id=${item.id},data-food-name=${item.name}">Order Now</button>
+                </div>
+            </div>
+            
+            <!-- Reviews section for this food item -->
+            <div class="food-reviews" th:id="'reviews-' + ${item.id}">
+                <h4>Reviews</h4>
+                <div class="reviews-container" th:id="'reviews-container-' + ${item.id}">
+                    <div class="loading-text">Loading reviews...</div>
+                </div>
+                <div class="review-actions">
+                    <button class="add-review-btn" th:attr="data-food-id=${item.id},data-food-name=${item.name}" style="display:none;">Add Review</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customer Reviews Section -->
+    <div class="reviews-section">
+        <h2>Latest Customer Reviews</h2>
+        <div id="latest-reviews" class="reviews-container">
+            <p class="loading-text">Loading reviews...</p>
+        </div>
+        <div class="text-center">
+            <a href="/reviews/all" class="view-all-btn">View All Reviews</a>
+        </div>
+    </div>
+
+</div>
+
+<!-- Order Modal -->
+<div id="orderModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:2rem;border-radius:8px;max-width:400px;width:90%;margin:auto;position:relative;">
+        <h2>Place Order</h2>
+        <form id="orderForm">
+            <input type="hidden" id="modalFoodId">
+            <input type="hidden" id="modalFoodName">
+            <div style="margin-bottom:1rem;">
+                <label>Quantity:</label>
+                <input type="number" id="modalQuantity" min="1" value="1" required style="width:100%;padding:0.5rem;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label>Address:</label>
+                <input type="text" id="modalAddress" required style="width:100%;padding:0.5rem;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label>Notes:</label>
+                <textarea id="modalNotes" style="width:100%;padding:0.5rem;"></textarea>
+            </div>
+            <button type="submit" style="background:#123458;color:#fff;padding:0.5rem 1rem;border:none;border-radius:4px;">Place Order</button>
+            <button type="button" id="closeOrderModal" style="margin-left:1rem;">Cancel</button>
+            <div id="orderStatus" style="margin-top:1rem;"></div>
+        </form>
+    </div>
+</div>
+<!-- My Orders Modal -->
+<div id="myOrdersModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:2rem;border-radius:8px;max-width:600px;width:95%;margin:auto;position:relative;max-height:90vh;overflow-y:auto;">
+        <h2>My Orders</h2>
+        <div id="ordersList">Loading...</div>
+        <button type="button" id="closeMyOrdersModal" style="margin-top:1rem;">Close</button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const logoutBtn = document.getElementById('logoutBtn');
+    const updateDetailsBtn = document.getElementById('updateDetailsBtn');
+    
+    // Check if user is logged in and is a customer
+    const role = localStorage.getItem('role');
+    const username = localStorage.getItem('username');
+    if (!role || role !== 'customer') {
+        alert('Access denied. Please log in as a customer.');
+        location.href = '/login';
+    }
+
+    // Show personalized welcome message
+    if (username) {
+        const welcome = document.getElementById('welcome-message');
+        welcome.textContent = `Welcome, ${username}!`;
+    }
+
+    // Update Details button now uses href instead of onclick
+    /*
+    updateDetailsBtn.onclick = async () => {
+        // Check if we have necessary data
+        const email = localStorage.getItem('email');
+        if (!email) {
+            alert('Please log in again');
+            location.href = '/login';
+            return;
+        }
+
+        // Get user ID from localStorage if not already there
+        if (!localStorage.getItem('id')) {
+            try {
+                const res = await fetch('/api/users/all');
+                const users = await res.json();
+                const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+                if (user) {
+                    localStorage.setItem('id', user.id);
+                    location.href = '/update-details';
+                } else {
+                    alert('User not found. Please log in again.');
+                    localStorage.clear();
+                    location.href = '/login';
+                }
+            } catch (error) {
+                alert('Error fetching user details. Please try again.');
+            }
+        } else {
+            location.href = '/update-details';
+        }
+    };
+    */
+
+    document.getElementById('logoutBtn').onclick = (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        location.href = '/';
+    };
+
+    // ORDER BUTTON LOGIC
+    document.querySelectorAll('.order-btn').forEach(btn => {
+        btn.onclick = function() {
+            const role = localStorage.getItem('role');
+            if (!role || role !== 'customer') {
+                location.href = '/login';
+                return;
+            }
+            // Show modal
+            document.getElementById('orderModal').style.display = 'flex';
+            document.getElementById('modalFoodId').value = btn.getAttribute('data-food-id');
+            document.getElementById('modalFoodName').value = btn.getAttribute('data-food-name');
+            document.getElementById('orderStatus').textContent = '';
+        };
+    });
+    document.getElementById('closeOrderModal').onclick = function() {
+        document.getElementById('orderModal').style.display = 'none';
+    };
+    document.getElementById('orderForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const foodItemId = document.getElementById('modalFoodId').value;
+        const foodName = document.getElementById('modalFoodName').value;
+        const quantity = parseInt(document.getElementById('modalQuantity').value);
+        const address = document.getElementById('modalAddress').value;
+        const notes = document.getElementById('modalNotes').value;
+        const customerId = localStorage.getItem('id');
+        const customerName = localStorage.getItem('username');
+        const customerEmail = localStorage.getItem('email');
+        if (!customerId || !customerName) {
+            alert('Please log in again.');
+            location.href = '/login';
+            return false;
+        }
+        const orderData = { foodItemId, foodName, quantity, address, notes, customerId, customerName };
+        const statusDiv = document.getElementById('orderStatus');
+        statusDiv.textContent = 'Placing order...';
+        try {
+            const res = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            
+            if (res.ok) {
+                const orderResponse = await res.json();
+                statusDiv.textContent = 'Order placed successfully! Redirecting to payment...';
+                
+                // Calculate price (this would normally come from the server)
+                const price = quantity * 500; // Assuming a fixed price of 500 per item
+                
+                // Redirect to payment page with order details
+                setTimeout(() => {
+                    document.getElementById('orderModal').style.display = 'none';
+                    window.location.href = `/payments/new?orderId=${orderResponse.id}&amount=${price}&email=${encodeURIComponent(customerEmail)}`;
+                }, 1500);
+            } else {
+                statusDiv.textContent = 'Failed to place order.';
+            }
+        } catch (err) {
+            statusDiv.textContent = 'Error placing order.';
+        }
+        return false;
+    };
+    // MY ORDERS BUTTON LOGIC
+    // Function to load orders
+    async function loadOrders() {
+        const customerId = localStorage.getItem('id');
+        if (!customerId) {
+            alert('Please log in again.');
+            location.href = '/login';
+            return;
+        }
+        const ordersList = document.getElementById('ordersList');
+        try {
+            const res = await fetch(`/api/orders/customer/${customerId}`);
+            if (res.ok) {
+                const orders = await res.json();
+                if (orders.length === 0) {
+                    ordersList.innerHTML = '<p>No orders found.</p>';
+                } else {
+                    ordersList.innerHTML = '<table style="width:100%;border-collapse:collapse;margin-bottom:1rem;"><tr><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Food</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Qty</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Address</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Notes</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Date</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Status</th></tr>' +
+                        orders.map(o => `<tr>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.foodName}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.quantity}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.address}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.notes}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.orderDate.replace('T','<br>')}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">
+                                ${o.status === 'Picked Up' || o.status === 'In Transit' || o.status === 'Delivered' ? 
+                                  `<span class="status-badge status-${o.status.toLowerCase().replace(' ', '')}">${o.status}</span>` : 
+                                  o.status}
+                                ${o.deliveryId ? `<br><a href="/delivery/track?id=${o.deliveryId}" class="track-link">Track Delivery</a>` : ''}
+                            </td>
+                        </tr>`).join('') + '</table>';
+                }
+            } else {
+                ordersList.innerHTML = '<p>Failed to load orders.</p>';
+            }
+        } catch (err) {
+            ordersList.innerHTML = '<p>Error loading orders.</p>';
+        }
+    }
+
+    // Set up auto-refresh interval when modal is open
+    let ordersRefreshInterval;
+
+    document.getElementById('myOrdersBtn').onclick = async function(e) {
+        e.preventDefault();
+        const customerId = localStorage.getItem('id');
+        if (!customerId) {
+            alert('Please log in again.');
+            location.href = '/login';
+            return;
+        }
+        document.getElementById('myOrdersModal').style.display = 'flex';
+        const ordersList = document.getElementById('ordersList');
+        ordersList.textContent = 'Loading...';
+        
+        // Load orders immediately
+        await loadOrders();
+        
+        // Set up auto-refresh every 30 seconds while modal is open
+        ordersRefreshInterval = setInterval(loadOrders, 30000);
+        try {
+            const res = await fetch(`/api/orders/customer/${customerId}`);
+            if (res.ok) {
+                const orders = await res.json();
+                if (orders.length === 0) {
+                    ordersList.innerHTML = '<p>No orders found.</p>';
+                } else {
+                    ordersList.innerHTML = '<table style="width:100%;border-collapse:collapse;margin-bottom:1rem;"><tr><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Food</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Qty</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Address</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Notes</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Date</th><th style="padding:0.75rem;text-align:left;border:1px solid #D4C9BE;">Status</th></tr>' +
+                        orders.map(o => `<tr>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.foodName}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.quantity}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.address}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.notes}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">${o.orderDate.replace('T','<br>')}</td>
+                            <td style="padding:0.75rem;border:1px solid #D4C9BE;">
+                                ${o.status === 'Picked Up' || o.status === 'In Transit' || o.status === 'Delivered' ? 
+                                  `<span class="status-badge status-${o.status.toLowerCase().replace(' ', '')}">${o.status}</span>` : 
+                                  o.status}
+                                ${o.deliveryId ? `<br><a href="/delivery/track?id=${o.deliveryId}" class="track-link">Track Delivery</a>` : ''}
+                            </td>
+                        </tr>`).join('') + '</table>';
+                }
+            } else {
+                ordersList.textContent = 'Failed to load orders.';
+            }
+        } catch (err) {
+            ordersList.textContent = 'Error loading orders.';
+        }
+    };
+    document.getElementById('closeMyOrdersModal').onclick = function() {
+        document.getElementById('myOrdersModal').style.display = 'none';
+        // Clear the refresh interval when modal is closed
+        if (ordersRefreshInterval) {
+            clearInterval(ordersRefreshInterval);
+            ordersRefreshInterval = null;
+        }
+    };
+    // Load latest reviews for the home page
+    async function loadLatestReviews() {
+        const reviewsContainer = document.getElementById('latest-reviews');
+        try {
+            const response = await fetch('/reviews/api/restaurant/1');
+            if (response.ok) {
+                const reviews = await response.json();
+                if (reviews.length === 0) {
+                    reviewsContainer.innerHTML = '<p class="text-center">No reviews yet. Be the first to leave a review!</p>';
+                } else {
+                    // Display up to 3 most recent reviews
+                    const latestReviews = reviews.slice(0, 3);
+                    let html = '';
+                    latestReviews.forEach(review => {
+                        html += `
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <div>
+                                        <div class="review-user">${review.userName || 'Anonymous'}</div>
+                                        <div class="review-date">${review.reviewDate}</div>
+                                    </div>
+                                    <div class="review-rating">
+                                        ${Array(review.rating).fill('★').join('')}
+                                    </div>
+                                </div>
+                                <div class="review-comment">${review.comment}</div>
+                            </div>
+                        `;
+                    });
+                    reviewsContainer.innerHTML = html;
+                }
+            } else {
+                reviewsContainer.innerHTML = '<p class="text-center">Failed to load reviews.</p>';
+            }
+        } catch (error) {
+            reviewsContainer.innerHTML = '<p class="text-center">Error loading reviews.</p>';
+        }
+    }
+
+    // Function to view food item reviews
+    function viewFoodReviews(event, foodId, foodName) {
+        event.preventDefault();
+        window.location.href = `/reviews/view/food/${foodId}?name=${encodeURIComponent(foodName)}`;
+    }
+
+    // Function to add a review for a completed order
+    function addReview(orderId, foodItemId, foodName) {
+        const userEmail = localStorage.getItem('email');
+        const userName = localStorage.getItem('username');
+        window.location.href = `/reviews/submit?targetType=food&targetId=${foodItemId}&orderId=${orderId}&userEmail=${encodeURIComponent(userEmail)}&userName=${encodeURIComponent(userName)}`;
+    }
+    
+    // Function to load reviews for a specific food item
+    async function loadFoodReviews(foodId) {
+        const reviewsContainer = document.getElementById(`reviews-container-${foodId}`);
+        if (!reviewsContainer) return;
+        
+        try {
+            const response = await fetch(`/reviews/api/food/${foodId}`);
+            if (response.ok) {
+                const reviews = await response.json();
+                if (reviews.length === 0) {
+                    reviewsContainer.innerHTML = '<div class="no-reviews">No reviews yet for this item.</div>';
+                } else {
+                    let html = '';
+                    reviews.forEach(review => {
+                        html += `
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <div>
+                                        <div class="review-user">${review.userName || 'Anonymous'}</div>
+                                        <div class="review-date">${review.reviewDate}</div>
+                                    </div>
+                                    <div class="review-rating">
+                                        ${Array(review.rating).fill('★').join('')}
+                                    </div>
+                                </div>
+                                <div class="review-comment">${review.comment}</div>
+                            </div>
+                        `;
+                    });
+                    reviewsContainer.innerHTML = html;
+                }
+            } else {
+                reviewsContainer.innerHTML = '<div class="no-reviews">Failed to load reviews.</div>';
+            }
+        } catch (error) {
+            reviewsContainer.innerHTML = '<div class="no-reviews">Error loading reviews.</div>';
+        }
+    }
+    
+    // Function to check if user has delivered orders for a food item
+    async function checkDeliveredOrders(foodId) {
+        const userId = localStorage.getItem('id');
+        const userEmail = localStorage.getItem('email');
+        if (!userId || !userEmail) return;
+        
+        try {
+            const response = await fetch(`/reviews/api/delivered-orders/${userId}`);
+            if (response.ok) {
+                const orders = await response.json();
+                const reviewBtn = document.querySelector(`.add-review-btn[data-food-id="${foodId}"]`);
+                
+                // Filter orders for this food item that are delivered
+                const deliveredOrders = orders.filter(order => order.foodItemId === foodId);
+                
+                if (deliveredOrders.length > 0) {
+                    // Check if user has already reviewed any of these orders
+                    let canReview = false;
+                    for (const order of deliveredOrders) {
+                        const reviewedResponse = await fetch(`/reviews/api/check-order?email=${encodeURIComponent(userEmail)}&orderId=${order.id}`);
+                        if (reviewedResponse.ok) {
+                            const hasReviewed = await reviewedResponse.json();
+                            if (!hasReviewed) {
+                                canReview = true;
+                                reviewBtn.setAttribute('data-order-id', order.id);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (canReview) {
+                        reviewBtn.style.display = 'block';
+                        reviewBtn.addEventListener('click', function() {
+                            const orderId = this.getAttribute('data-order-id');
+                            const foodId = this.getAttribute('data-food-id');
+                            const foodName = this.getAttribute('data-food-name');
+                            addReview(orderId, foodId, foodName);
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error checking delivered orders:', error);
+        }
+    }
+
+    // Load reviews when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // For each food item, load its reviews
+        const foodItems = document.querySelectorAll('.food-item-container');
+        foodItems.forEach(item => {
+            const foodId = item.querySelector('.order-btn').getAttribute('data-food-id');
+            if (foodId) {
+                loadFoodReviews(foodId);
+                checkDeliveredOrders(foodId);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
