@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Snak Sprint • About Us</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        body {
+            background-color: #F1EFEC;
+            background-image: url('https://images.unsplash.com/photo-1495195134817-033afe8d5f5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #123458, #030303);
+            color: #F1EFEC;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero-section p {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        nav {
+            background: #D4C9BE;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0;
+            width: 100%;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.5rem 1rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #123458;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #123458;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #030303;
+        }
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+        }
+        nav button {
+            background: #123458;
+            color: #F1EFEC;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        nav button:hover {
+            background: #030303;
+        }
+        .team-section {
+            background: #F1EFEC;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .team-section h2 {
+            color: #123458;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+        .team-member {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            padding: 1.5rem;
+        }
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .team-member h3 {
+            color: #123458;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+        }
+        .team-member .id {
+            color: #123458;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .team-member .component {
+            background: #123458;
+            color: white;
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .team-member .role {
+            color: #030303;
+            font-style: italic;
+        }
+        .about-content {
+            background: #F1EFEC;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .about-content h2 {
+            color: #123458;
+            margin-bottom: 1rem;
+        }
+        .about-content p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: #030303;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-container">
+        <div class="logo">🍔 Snak Sprint</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            
+        </div>
+        <div class="nav-buttons">
+            <button id="loginBtn" th:unless="${user}" onclick="location.href='/login'">Login</button>
+            <button id="updateBtn" th:if="${user}" style="display:inline-block;" onclick="location.href='/update-details'">Update Details</button>
+            <button id="logoutBtn" th:if="${user}" onclick="fetch('/api/users/logout', { method: 'POST' }).then(() => location.reload());">Logout</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="hero-section">
+        <h1>About Snak Sprint</h1>
+        <p>Meet the team behind your favorite food delivery service</p>
+    </div>
+
+    <div class="about-content">
+        <h2>Our Mission</h2>
+        <p>At Snak Sprint, we're passionate about connecting people with delicious food from their favorite local restaurants. Our platform makes it easy to browse menus, place orders, and have food delivered right to your doorstep.</p>
+        <p>Founded with the vision of transforming the food delivery experience, we strive to provide exceptional service, a wide variety of cuisine options, and a seamless ordering process for all our customers.</p>
+    </div>
+
+    <div class="team-section">
+        <h2>Our Team</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <h3>Liyanage Y.I</h3>
+                <div class="id">IT24104179</div>
+                <div class="component">Component 1</div>
+                <div class="role">User Management</div>
+            </div>
+
+            <div class="team-member">
+                <h3>Kumara A.G.L.M.P</h3>
+                <div class="id">IT24100512</div>
+                <div class="component">Component 2</div>
+                <div class="role">Menu Management</div>
+            </div>
+
+            <div class="team-member">
+                <h3>Dilfer M.R.N.A</h3>
+                <div class="id">IT24100084</div>
+                <div class="component">Component 3</div>
+                <div class="role">Order Management</div>
+            </div>
+
+            <div class="team-member">
+                <h3>Pathberiya H.A</h3>
+                <div class="id">IT24100576</div>
+                <div class="component">Component 4</div>
+                <div class="role">Delivery Management</div>
+            </div>
+
+            <div class="team-member">
+                <h3>Iddippilige N.K</h3>
+                <div class="id">IT24100035</div>
+                <div class="component">Component 5</div>
+                <div class="role">Payment Management</div>
+            </div>
+
+            <div class="team-member">
+                <h3>Hettiarachchi H.A.B.D</h3>
+                <div class="id">IT24102329</div>
+                <div class="component">Component 6</div>
+                <div class="role">Review Management</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const user = /*[[${user}]]*/ null;
+    const role = /*[[${role}]]*/ null;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update login/logout buttons based on user status
+        const loginBtn = document.getElementById('loginBtn');
+        const updateBtn = document.getElementById('updateBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        if (user) {
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (updateBtn) updateBtn.style.display = 'inline-block';
+            if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        } else {
+            if (loginBtn) loginBtn.style.display = 'inline-block';
+            if (updateBtn) updateBtn.style.display = 'none';
+            if (logoutBtn) logoutBtn.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>

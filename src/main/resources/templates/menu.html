@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snak Sprint • Menu Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #F1EFEC;
+            background-image: url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+        }
+        nav {
+            background: #D4C9BE;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0;
+            width: 100%;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.5rem 1rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #123458;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #123458;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #030303;
+        }
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+        }
+        nav button, .nav-buttons a, .nav-links a {
+            background: transparent;
+            color: #123458;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 500;
+            font-family: inherit;
+        }
+        nav button:hover, .nav-buttons a:hover, .nav-links a:hover {
+            color: #030303;
+            transform: translateY(-2px);
+        }
+        .food-card {
+            transition: transform 0.3s;
+            height: 100%;
+            background: #F1EFEC;
+            border: 1px solid #D4C9BE;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .food-image {
+            height: 200px;
+            object-fit: cover;
+        }
+        .veg-badge {
+            background-color: #4CAF50;
+        }
+        .non-veg-badge {
+            background-color: #F44336;
+        }
+        .unavailable {
+            opacity: 0.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #123458, #030303);
+            color: white;
+            padding: 2rem;
+            margin: 1rem 0 2rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background: #123458;
+            border-color: #123458;
+        }
+        .btn-primary:hover {
+            background: #0a1e33;
+            border-color: #0a1e33;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🍔 Snak Sprint</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/menu">Menu</a>
+                <a href="/menu/add">Add Food</a>
+                <a href="/orders">Orders</a>
+
+            </div>
+            <div class="nav-buttons">
+                <a href="/update-details" id="updateDetailsBtn">Update Details</a>
+                <a href="/owner-home">Dashboard</a>
+                <a href="#" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1 class="display-4 fw-bold">
+                    <i class="fas fa-utensils me-2"></i>Menu Management
+                </h1>
+                <p class="lead">Manage your food items and menu offerings</p>
+            </div>
+            <div>
+                <a th:href="@{/menu/add}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Add New Food Item
+                </a>
+            </div>
+        </div>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <!-- No Items Message -->
+        <div th:if="${#lists.isEmpty(foodItems)}" class="alert alert-info text-center p-5">
+            <i class="fas fa-info-circle fa-3x mb-3"></i>
+            <h3>No food items available</h3>
+            <p>Start by adding your first food item to the menu.</p>
+        </div>
+        
+        <!-- Food Items Grid -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div th:each="item : ${foodItems}" class="col">
+                <div th:class="${item.available ? 'card food-card' : 'card food-card unavailable'}">
+                    <div class="position-relative">
+                        <img th:if="${item.imageUrl != null && !item.imageUrl.isEmpty()}" 
+                             th:src="@{${item.imageUrl}(v=${#dates.createNow().getTime()})}" 
+                             class="card-img-top food-image" 
+                             alt="Food Image"
+                             th:attr="data-original-src=${item.imageUrl}"
+                             onerror="handleImageError(this)">
+                        <img th:if="${item.imageUrl == null || item.imageUrl.isEmpty()}" 
+                             src="https://via.placeholder.com/300x200?text=No+Image" 
+                             class="card-img-top food-image" 
+                             alt="No Image">
+                        <span th:if="${item.type == 'veg'}" 
+                              class="position-absolute top-0 start-0 badge veg-badge m-2">
+                            <i class="fas fa-leaf me-1"></i>Veg
+                        </span>
+                        <span th:if="${item.type == 'non-veg'}" 
+                              class="position-absolute top-0 start-0 badge non-veg-badge m-2">
+                            <i class="fas fa-drumstick-bite me-1"></i>Non-Veg
+                        </span>
+                        <span th:if="${!item.available}" 
+                              class="position-absolute top-0 end-0 badge bg-secondary m-2">
+                            <i class="fas fa-ban me-1"></i>Unavailable
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${item.name}">Food Name</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Rs <span th:text="${#numbers.formatDecimal(item.price, 0, 2)}">0.00</span></h6>
+                        <p class="card-text" th:text="${item.description}">Description</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/menu/edit/{id}(id=${item.id})}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-1"></i>Edit
+                            </a>
+                            <a th:href="@{/menu/delete/{id}(id=${item.id})}" 
+                               class="btn btn-outline-danger"
+                               onclick="return confirm('Are you sure you want to delete this item?')">
+                                <i class="fas fa-trash-alt me-1"></i>Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if user is logged in and is an owner
+        document.addEventListener('DOMContentLoaded', function() {
+            const role = localStorage.getItem('role');
+            
+            if (!role || role !== 'owner') {
+                alert('Access denied. Please log in as a restaurant owner.');
+                location.href = '/login';
+            }
+            
+            // Logout button functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.onclick = () => {
+                localStorage.clear();
+                location.href = '/';
+            };
+            
+            // Function to handle image loading and caching issues
+            const foodImages = document.querySelectorAll('.food-image');
+            
+            // Function to handle image errors with retry logic
+            function handleImageError(img) {
+                console.error('Failed to load image:', img.src);
+                
+                // Get the original source if available
+                const originalSrc = img.getAttribute('data-original-src');
+                
+                if (originalSrc) {
+                    // Try to reload the image with a delay (gives server time to process)
+                    console.log('Retrying image load in 2 seconds:', originalSrc);
+                    
+                    // Set a temporary placeholder
+                    img.src = 'https://via.placeholder.com/300x200?text=Loading...';
+                    
+                    // Retry after 2 seconds
+                    setTimeout(function() {
+                        const timestamp = new Date().getTime();
+                        img.src = originalSrc + '?v=' + timestamp;
+                        console.log('Retrying image:', img.src);
+                    }, 2000);
+                    
+                    // Set up one more retry if needed
+                    img.onerror = function() {
+                        console.error('Second attempt failed for image:', originalSrc);
+                        this.onerror = null; // Prevent infinite error loops
+                        this.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found';
+                    };
+                } else {
+                    // No original source, use placeholder
+                    img.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found';
+                    img.onerror = null; // Prevent infinite error loops
+                }
+            }
+            
+            // Add timestamp to force reload and prevent caching
+            foodImages.forEach(function(img) {
+                if (img.src && !img.src.includes('placeholder')) {
+                    // Set up image loading success handling
+                    img.onload = function() {
+                        console.log('Successfully loaded image:', this.src);
+                    };
+                    
+                    // Add timestamp to prevent browser caching
+                    const timestamp = new Date().getTime();
+                    
+                    // Remove any existing query parameters
+                    let imgSrc = img.src.split('?')[0];
+                    
+                    // Add new timestamp parameter
+                    img.src = imgSrc + '?v=' + timestamp;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

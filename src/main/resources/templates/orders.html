@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Snak Sprint • All Orders</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+        body { background: #F1EFEC; font-family: Arial, sans-serif; }
+        .container { max-width: 1200px; margin: 2rem auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 2rem; }
+        h2 { color: #123458; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { padding: 0.75rem; border: 1px solid #D4C9BE; text-align: left; }
+        th { background: #123458; color: #fff; }
+        tr:nth-child(even) { background: #F1EFEC; }
+        button { padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #ccc; }
+        .deliver-btn { background: #4CAF50; color: white; border: 1px solid #4CAF50; margin: 0 2px; cursor: pointer; }
+        .deliver-btn:hover { background: #45a049; }
+        .payment-btn { background: #3498db; color: white; border: 1px solid #3498db; margin: 0 2px; cursor: pointer; }
+        .payment-btn:hover { background: #2980b9; }
+        .review-btn { background: #f39c12; color: white; border: 1px solid #f39c12; margin: 0 2px; cursor: pointer; }
+        .review-btn:hover { background: #e67e22; }
+        .payment-status { display: inline-block; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 500; font-size: 0.9rem; }
+        .status-paid { background: #2ecc71; color: #fff; }
+        .status-unpaid { background: #e74c3c; color: #fff; }
+        .track-link { color: #3498db; text-decoration: none; font-weight: 500; }
+        .track-link:hover { text-decoration: underline; }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .status-placed { background: #f1c40f; color: #000; }
+        .status-preparing { background: #3498db; color: #fff; }
+        .status-completed { background: #2ecc71; color: #fff; }
+        .status-cancelled { background: #e74c3c; color: #fff; }
+        .status-delivering { background: #9b59b6; color: #fff; }
+        .back-btn { background: #123458; color: #fff; border: none; padding: 0.5rem 1.2rem; border-radius: 4px; margin-bottom: 1rem; cursor: pointer; }
+        .back-btn:hover { background: #030303; }
+        .nav-link {
+            color: #123458;
+            text-decoration: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            margin: 0 0.1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: #123458;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(18,52,88,0.08);
+        }
+        .nav-btn {
+            background: #fff;
+            color: #123458;
+            border: 1px solid #d4c9be;
+            border-radius: 6px;
+            padding: 0.45rem 1.1rem;
+            font-weight: 500;
+            font-size: 1.02rem;
+            margin-left: 0.2rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(18,52,88,0.04);
+        }
+        .nav-btn:hover, .nav-btn.logout-btn:hover {
+            background: #123458;
+            color: #fff;
+            border-color: #123458;
+        }
+        .logout-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: 1px solid #e74c3c;
+            margin-left: 0.5rem;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        /* Tab styles */
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #D4C9BE;
+        }
+        
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #123458;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            color: #123458;
+            font-weight: 600;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #123458;
+        }
+        
+        /* Queue styles */
+        .queue-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .queue-btn {
+            background: #123458;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .queue-btn:hover {
+            background: #0A1E33;
+        }
+        
+        .queue-btn:disabled {
+            background: #D4C9BE;
+            cursor: not-allowed;
+        }
+        
+        .queue-size {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #123458;
+        }
+        
+        .queue-container {
+            background: #F1EFEC;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .queue-visualization {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .queue-header, .queue-footer {
+            display: flex;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        
+        .queue-item-header, .queue-item-footer {
+            background: #123458;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        
+        .queue-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .queue-item {
+            background: #fff;
+            border: 1px solid #D4C9BE;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .queue-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .queue-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #D4C9BE;
+        }
+        
+        .queue-item-title {
+            font-weight: 600;
+            color: #123458;
+        }
+        
+        .queue-item-status {
+            font-size: 0.9rem;
+        }
+        
+        .queue-item-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .queue-item-detail {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .queue-item-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .queue-item-value {
+            font-weight: 500;
+        }
+        
+        .empty-queue {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<nav style="backdrop-filter: blur(8px); background: rgba(212,201,190,0.95); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-radius: 0 0 18px 18px; margin-bottom: 2rem;">
+    <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0.7rem 2rem;">
+        <div class="logo" style="font-size: 1.7rem; font-weight: bold; color: #123458; letter-spacing: 1px;">🍔 Snak Sprint</div>
+        <div class="nav-buttons" style="display: flex; align-items: center; gap: 0.5rem;">
+            <a href="#" id="adminDashboardBtn" class="nav-btn">Admin Dashboard</a>
+            <a href="#" id="logoutBtn" class="nav-btn logout-btn">Logout</a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <button class="back-btn" onclick="location.href='/owner-home'">&larr; Back to Dashboard</button>
+    <div class="tabs">
+        <button class="tab-btn active" id="all-orders-tab">All Orders</button>
+        <button class="tab-btn" id="queue-tab">Order Queue</button>
+    </div>
+    
+    <div id="all-orders-section">
+        <h2>All Customer Orders</h2>
+        <div id="ordersStatus"></div>
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>Food</th>
+                    <th>Qty</th>
+                    <th>Address</th>
+                    <th>Notes</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="7">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="queue-section" style="display: none;">
+        <h2>Order Processing Queue</h2>
+        <div class="queue-controls">
+            <button id="process-next-btn" class="queue-btn">Process Next Order</button>
+            <span id="queue-size" class="queue-size">Queue Size: 0</span>
+        </div>
+        <div class="queue-container">
+            <div class="queue-visualization">
+                <div class="queue-header">
+                    <div class="queue-item-header">Front of Queue</div>
+                </div>
+                <div id="queue-items" class="queue-items">
+                    <div class="empty-queue">No orders in queue</div>
+                </div>
+                <div class="queue-footer">
+                    <div class="queue-item-footer">Back of Queue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Details Modal -->
+<div id="paymentDetailsModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <span class="close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-top: 0; color: #123458;">Payment Details</h2>
+        <div id="paymentDetailsList" style="margin-top: 20px;">
+            <p>Loading payment details...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auth check
+const role = localStorage.getItem('role');
+if (!role || role !== 'owner') {
+    alert('Access denied. Please log in as a restaurant owner.');
+    location.href = '/login';
+}
+// Logout
+const logoutBtn = document.getElementById('logoutBtn');
+logoutBtn.onclick = () => { localStorage.clear(); location.href = '/'; };
+// Admin Dashboard
+const adminDashboardBtn = document.getElementById('adminDashboardBtn');
+adminDashboardBtn.onclick = () => { location.href = '/admin-dashboard'; };
+
+// Fetch and render orders
+async function loadOrders() {
+    const tableBody = document.querySelector('#ordersTable tbody');
+    tableBody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
+    try {
+        const res = await fetch('/api/orders');
+        if (!res.ok) throw new Error('Failed to fetch orders');
+        const orders = await res.json();
+        
+        if (orders.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8">No orders found.</td></tr>';
+            return;
+        }
+        
+        // Sort orders by date in descending order (newest first)
+        orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        
+        // Generate table rows
+        let html = '';
+        orders.forEach(order => {
+            html += `
+            <tr data-order-id="${order.id}">
+                <td>${order.foodName}</td>
+                <td>${order.quantity}</td>
+                <td>${order.address}</td>
+                <td>${order.notes || '-'}</td>
+                <td>${order.customerName}</td>
+                <td>${order.orderDate.replace('T', '<br>')}</td>
+                <td>
+                    <span class="payment-status" data-order-id="${order.id}">Checking...</span>
+                </td>
+                <td>
+                    <div class="flex space-x-2">
+                        ${order.status === 'Completed' || order.status === 'Cancelled' ? '' : 
+                          `<button class="deliver-btn" onclick="location.href='/delivery/assign?orderId=${order.id}'">Deliver</button>`}
+                        <button class="payment-btn" onclick="showPaymentDetails('${order.id}')">Payment Details</button>
+                        <button class="queue-btn" style="background: #123458; color: white; border: 1px solid #123458; margin: 0 2px; cursor: pointer;" onclick="addToQueue('${order.id}')">Add to Queue</button>
+                        ${order.status === 'Completed' ? 
+                          `<button class="review-btn" onclick="location.href='/reviews/submit?targetType=food&targetId=${order.foodItemId}&orderId=${order.id}'">Add Review</button>` : ''}
+                    </div>
+                </td>
+            </tr>`;
+        });
+        
+        tableBody.innerHTML = html;
+        
+        // Check payment status for each order
+        document.querySelectorAll('.payment-status').forEach(async (statusElem) => {
+            const orderId = statusElem.getAttribute('data-order-id');
+            try {
+                const res = await fetch(`/payments/process-payment?orderId=${orderId}`);
+                if (res.ok) {
+                    const status = await res.text();
+                    if (status === 'paid') {
+                        statusElem.textContent = 'Paid';
+                        statusElem.classList.add('status-paid');
+                    } else {
+                        statusElem.textContent = 'Unpaid';
+                        statusElem.classList.add('status-unpaid');
+                    }
+                }
+            } catch (err) {
+                statusElem.textContent = 'Unknown';
+            }
+        });
+        
+        // Payment Details Modal Functions
+        const modal = document.getElementById('paymentDetailsModal');
+        const closeBtn = document.querySelector('.close');
+        const paymentDetailsList = document.getElementById('paymentDetailsList');
+        
+        // Close the modal when clicking the X
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    } catch (err) {
+        tableBody.innerHTML = '<tr><td colspan="7">Error loading orders.</td></tr>';
+    }
+}
+// Function to show payment details
+async function showPaymentDetails(orderId) {
+    const modal = document.getElementById('paymentDetailsModal');
+    const paymentDetailsList = document.getElementById('paymentDetailsList');
+    
+    modal.style.display = 'block';
+    paymentDetailsList.innerHTML = '<p>Loading payment details...</p>';
+    
+    try {
+        // Direct API call to get payment details
+        const res = await fetch(`/api/orders/${orderId}/payments`);
+        if (res.ok) {
+            const payments = await res.json();
+            if (payments.length === 0) {
+                paymentDetailsList.innerHTML = '<p>No payment records found for this order.</p>';
+            } else {
+                let html = '<table style="width:100%; border-collapse: collapse; margin-top: 10px;">';
+                html += '<tr style="background-color: #123458; color: white;">';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Payment ID</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Amount</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Date</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Card</th>';
+                html += '<th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Status</th>';
+                html += '</tr>';
+                
+                payments.forEach(payment => {
+                    html += `<tr style="border: 1px solid #ddd;">`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.paymentId}</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.amount} LKR</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.paymentDate}</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;">${payment.cardType} **** ${payment.cardNumber.substring(12)}</td>`;
+                    html += `<td style="padding: 8px; border: 1px solid #ddd;"><span class="status-paid" style="padding: 4px 8px; border-radius: 4px;">${payment.paymentStatus}</span></td>`;
+                    html += `</tr>`;
+                });
+                
+                html += '</table>';
+                paymentDetailsList.innerHTML = html;
+            }
+        } else {
+            paymentDetailsList.innerHTML = '<p>Failed to load payment details.</p>';
+        }
+    } catch (err) {
+        console.error('Error fetching payment details:', err);
+        paymentDetailsList.innerHTML = '<p>Error loading payment details.</p>';
+    }
+}
+
+// Tab switching functionality
+document.getElementById('all-orders-tab').addEventListener('click', function() {
+    document.getElementById('all-orders-section').style.display = 'block';
+    document.getElementById('queue-section').style.display = 'none';
+    document.getElementById('all-orders-tab').classList.add('active');
+    document.getElementById('queue-tab').classList.remove('active');
+});
+
+document.getElementById('queue-tab').addEventListener('click', function() {
+    document.getElementById('all-orders-section').style.display = 'none';
+    document.getElementById('queue-section').style.display = 'block';
+    document.getElementById('all-orders-tab').classList.remove('active');
+    document.getElementById('queue-tab').classList.add('active');
+    loadOrderQueue(); // Load the queue when switching to the tab
+});
+
+// Process next order in queue
+document.getElementById('process-next-btn').addEventListener('click', processNextOrder);
+
+// Function to load the order queue
+async function loadOrderQueue() {
+    const queueItems = document.getElementById('queue-items');
+    const queueSize = document.getElementById('queue-size');
+    const processNextBtn = document.getElementById('process-next-btn');
+    
+    try {
+        // Get queue size
+        const sizeResponse = await fetch('/api/orders/queue/size');
+        if (sizeResponse.ok) {
+            const size = await sizeResponse.json();
+            queueSize.textContent = `Queue Size: ${size}`;
+            
+            // Enable/disable process button based on queue size
+            processNextBtn.disabled = size === 0;
+        }
+        
+        // Get all orders in the queue
+        const ordersResponse = await fetch('/api/orders/queue');
+        if (ordersResponse.ok) {
+            const orders = await ordersResponse.json();
+            
+            if (orders.length === 0) {
+                queueItems.innerHTML = '<div class="empty-queue">No orders in queue</div>';
+                return;
+            }
+            
+            let html = '';
+            orders.forEach((order, index) => {
+                html += `
+                <div class="queue-item" data-order-id="${order.id}">
+                    <div class="queue-item-header">
+                        <div class="queue-item-title">${order.foodName}</div>
+                        <div class="queue-item-status">
+                            <span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span>
+                        </div>
+                    </div>
+                    <div class="queue-item-details">
+                        <div class="queue-item-detail">
+                            <span class="queue-item-label">Order ID</span>
+                            <span class="queue-item-value">${order.id.substring(0, 8)}...</span>
+                        </div>
+                        <div class="queue-item-detail">
+                            <span class="queue-item-label">Customer</span>
+                            <span class="queue-item-value">${order.customerName}</span>
+                        </div>
+                        <div class="queue-item-detail">
+                            <span class="queue-item-label">Quantity</span>
+                            <span class="queue-item-value">${order.quantity}</span>
+                        </div>
+                        <div class="queue-item-detail">
+                            <span class="queue-item-label">Total</span>
+                            <span class="queue-item-value">$${order.totalAmount.toFixed(2)}</span>
+                        </div>
+                        <div class="queue-item-detail">
+                            <span class="queue-item-label">Date</span>
+                            <span class="queue-item-value">${new Date(order.orderDate).toLocaleString()}</span>
+                        </div>
+                        <div class="queue-item-detail">
+                            <span class="queue-item-label">Position in Queue</span>
+                            <span class="queue-item-value">${index + 1}</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            queueItems.innerHTML = html;
+        } else {
+            queueItems.innerHTML = '<div class="empty-queue">Failed to load order queue</div>';
+        }
+    } catch (error) {
+        console.error('Error loading order queue:', error);
+        queueItems.innerHTML = '<div class="empty-queue">Error loading order queue</div>';
+    }
+}
+
+// Function to process the next order in the queue
+async function processNextOrder() {
+    try {
+        const response = await fetch('/api/orders/process/next');
+        if (response.ok) {
+            const processedOrder = await response.json();
+            if (processedOrder) {
+                // Show success message
+                alert(`Processed order: ${processedOrder.foodName} for ${processedOrder.customerName}`);
+                
+                // Update the order status in the main orders table
+                loadOrders();
+                
+                // Reload the queue
+                loadOrderQueue();
+            } else {
+                alert('No orders in the queue to process');
+            }
+        } else {
+            alert('Failed to process order');
+        }
+    } catch (error) {
+        console.error('Error processing order:', error);
+        alert('Error processing order');
+    }
+}
+
+// Function to add an order to the queue
+async function addToQueue(orderId) {
+    try {
+        // Show loading message
+        const loadingMsg = document.createElement('div');
+        loadingMsg.id = 'loading-msg';
+        loadingMsg.style.position = 'fixed';
+        loadingMsg.style.top = '50%';
+        loadingMsg.style.left = '50%';
+        loadingMsg.style.transform = 'translate(-50%, -50%)';
+        loadingMsg.style.background = 'rgba(255, 255, 255, 0.9)';
+        loadingMsg.style.padding = '20px';
+        loadingMsg.style.borderRadius = '5px';
+        loadingMsg.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+        loadingMsg.style.zIndex = '9999';
+        loadingMsg.textContent = 'Adding order to queue...';
+        document.body.appendChild(loadingMsg);
+        
+        // Get the order from the table row
+        const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+        if (!orderRow) {
+            throw new Error('Order row not found');
+        }
+        
+        // Extract order details from the table row
+        const foodName = orderRow.cells[0].textContent;
+        const quantity = parseInt(orderRow.cells[1].textContent);
+        const address = orderRow.cells[2].textContent;
+        const notes = orderRow.cells[3].textContent;
+        const customerName = orderRow.cells[4].textContent;
+        const orderDate = orderRow.cells[5].textContent.replace('<br>', 'T');
+        
+        // Create order object
+        const order = {
+            id: orderId,
+            foodItemId: orderId.split('-')[0], // Use part of the order ID as food item ID
+            foodName: foodName,
+            quantity: quantity,
+            price: 0, // Will be set by the server
+            totalAmount: 0, // Will be calculated by the server
+            address: address,
+            notes: notes === '-' ? '' : notes,
+            customerId: 'customer-' + Math.random().toString(36).substring(2, 9), // Generate a dummy customer ID
+            customerName: customerName,
+            orderDate: orderDate,
+            status: 'Pending'
+        };
+        
+        // Add the order to the queue
+        const response = await fetch('/api/orders/enqueue', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(order)
+        });
+        
+        // Remove loading message
+        document.body.removeChild(loadingMsg);
+        
+        if (response.ok) {
+            alert('Order added to processing queue');
+            // Reload the queue if we're on the queue tab
+            if (document.getElementById('queue-section').style.display !== 'none') {
+                loadOrderQueue();
+            }
+        } else {
+            const errorText = await response.text();
+            alert(`Failed to add order to queue: ${errorText}`);
+        }
+    } catch (error) {
+        console.error('Error adding order to queue:', error);
+        alert(`Error adding order to queue: ${error.message}`);
+        
+        // Remove loading message if it exists
+        const loadingMsg = document.getElementById('loading-msg');
+        if (loadingMsg) {
+            document.body.removeChild(loadingMsg);
+        }
+    }
+}
+
+window.onload = function() {
+    loadOrders();
+    // Initialize tabs
+    document.getElementById('all-orders-tab').click();
+};
+</script>
+</body>
+</html> 

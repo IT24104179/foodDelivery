@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Snak Sprint • Track Deliveries</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background: #F1EFEC; font-family: Arial, sans-serif; }
+        .container { max-width: 1200px; margin: 2rem auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 2rem; }
+        h1 { color: #123458; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { padding: 0.75rem; border: 1px solid #D4C9BE; text-align: left; }
+        th { background: #123458; color: #fff; }
+        tr:nth-child(even) { background: #F1EFEC; }
+        select, button { padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #ccc; }
+        button { background: #123458; color: white; cursor: pointer; }
+        button:hover { background: #0a1f33; }
+        .nav-link {
+            color: #123458;
+            text-decoration: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            margin: 0 0.1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: #123458;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(18,52,88,0.08);
+        }
+        .nav-btn {
+            background: #fff;
+            color: #123458;
+            border: 1px solid #d4c9be;
+            border-radius: 6px;
+            padding: 0.45rem 1.1rem;
+            font-weight: 500;
+            font-size: 1.02rem;
+            margin-left: 0.2rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(18,52,88,0.04);
+        }
+        .nav-btn:hover {
+            background: #123458;
+            color: #fff;
+            border-color: #123458;
+        }
+        .logout-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: 1px solid #e74c3c;
+            margin-left: 0.5rem;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <nav style="backdrop-filter: blur(8px); background: rgba(212,201,190,0.95); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-radius: 0 0 18px 18px; margin-bottom: 2rem;">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0.7rem 2rem;">
+            <div class="logo" style="font-size: 1.7rem; font-weight: bold; color: #123458; letter-spacing: 1px;">🍔 Snak Sprint</div>
+            <div class="nav-buttons" style="display: flex; align-items: center; gap: 0.5rem;">
+                <a href="/owner-home" class="nav-btn">Dashboard</a>
+                <a href="/orders" class="nav-btn">Orders</a>
+                <a href="#" id="logoutBtn" class="nav-btn logout-btn">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Active Deliveries</h1>
+        <table class="w-full bg-white shadow-md rounded">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="py-2 px-4">Delivery ID</th>
+                    <th class="py-2 px-4">Order ID</th>
+                    <th class="py-2 px-4">Delivery Person</th>
+                    <th class="py-2 px-4">Status</th>
+                    <th class="py-2 px-4">Assigned Time</th>
+                    <th class="py-2 px-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="delivery : ${activeDeliveries}" class="border-b">
+                    <td class="py-2 px-4" th:text="${delivery.deliveryId}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.orderId}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.deliveryPersonId}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.status}"></td>
+                    <td class="py-2 px-4" th:text="${delivery.assignedTime != null ? #temporals.format(delivery.assignedTime, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}"></td>
+                    <td class="py-2 px-4">
+                        <form th:action="@{/delivery/update-status}" method="post" class="inline">
+                            <input type="hidden" name="deliveryId" th:value="${delivery.deliveryId}">
+                            <select name="newStatus" class="mr-2">
+                                <option value="Picked Up">Picked Up</option>
+                                <option value="In Transit">In Transit</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mt-4 space-x-4">
+            <a href="/delivery/assign" class="text-blue-500 hover:underline">Assign New Delivery</a>
+            <a href="/delivery/history" class="text-blue-500 hover:underline">View Delivery History</a>
+        </div>
+    </div>
+    <script>
+        // Auth check
+        const role = localStorage.getItem('role');
+        if (!role || role !== 'owner') {
+            alert('Access denied. Please log in as a restaurant owner.');
+            location.href = '/login';
+        }
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.onclick = () => { localStorage.clear(); location.href = '/'; };
+    </script>
+</body>
+</html>
