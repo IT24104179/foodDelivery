@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List; //List and stream
 
 public class UserFileHandler {
-    private static final String FILE_PATH = "users.txt"; // since this is static,don't need to make an object to access it
+    private static final String FILE_PATH = "users.txt";
 
     // create method
     public static void saveUser(User user) {
